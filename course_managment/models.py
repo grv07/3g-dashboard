@@ -2,16 +2,21 @@ from django.db import models
 
 import uuid
 
+from signals import signal
+from django.db.models.signals import post_save
+
+
 name_defination = lambda title, code : title+"-"+str(code)[:8]
+default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 
 # ---Global MSG---
 # Code is primary
-# Order by created date 
+# Order by created date
 
 class Course(models.Model):
     """Course class for CRUD"""
     title = models.CharField(max_length=100)
-    class_category = models.ForeignKey('classes.ClassCategory', default=0)
+    class_category = models.ForeignKey('classes.ClassCategory', default=default_uuid)
 
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(max_length=500)
@@ -24,12 +29,13 @@ class Course(models.Model):
 
     def __str__(self):
         """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)    
+        return name_defination(self.title, self.code)
+
 
 class Subject(models.Model):
     """Subject class for CRUD"""
     title = models.CharField(max_length=100, blank=True, default='')
-    course = models.ForeignKey('Course', default=0)
+    course = models.ForeignKey('Course', default=default_uuid)
 
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(max_length=500)
@@ -42,12 +48,13 @@ class Subject(models.Model):
 
     def __str__(self):
         """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)    
+        return name_defination(self.title, self.code)
+
 
 class Chapter(models.Model):
     """Chapter class for CRUD"""
     title = models.CharField(max_length=100, blank=True, default='')
-    chapter = models.ForeignKey('Subject', default=0)
+    chapter = models.ForeignKey('Subject', default=default_uuid)
 
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(max_length=500)
@@ -60,12 +67,13 @@ class Chapter(models.Model):
 
     def __str__(self):
         """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)    
+        return name_defination(self.title, self.code)
+
 
 class Topic(models.Model):
     """Topic class for CRUD"""
     title = models.CharField(max_length=100, blank=True, default='')
-    topic = models.ForeignKey('Chapter', default=0)
+    topic = models.ForeignKey('Chapter', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(max_length=500)
 
@@ -73,14 +81,15 @@ class Topic(models.Model):
     
     class Meta:
         ordering = ('created',)
+
     def __str__(self):
         """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)    
+        return name_defination(self.title, self.code)  
 
 class ModuleData(models.Model):
     """ModuleData class for CRUD"""
     title = models.CharField(max_length=100, blank=False)
-    topic = models.ForeignKey('Topic', default=0)
+    topic = models.ForeignKey('Topic', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField(max_length=500)
 
@@ -91,5 +100,10 @@ class ModuleData(models.Model):
 
     def __str__(self):
         """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)                       
-# Create your models here.
+        return name_defination(self.title, self.code)
+
+post_save.connect(signal.create_course, sender=Course)
+post_save.connect(signal.create_subject, sender=Subject)
+post_save.connect(signal.create_chapter, sender=Chapter)
+post_save.connect(signal.create_topic, sender=Topic)
+post_save.connect(signal.create_module, sender=ModuleData)
