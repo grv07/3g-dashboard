@@ -1,10 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 import uuid
 
 from signals import signal
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save, m2m_changed
 
+# from  django.db.models.signals.m2m_changed import post_add
 
 name_defination = lambda title, code : title+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
@@ -107,3 +109,5 @@ post_save.connect(signal.create_subject, sender=Subject)
 post_save.connect(signal.create_chapter, sender=Chapter)
 post_save.connect(signal.create_topic, sender=Topic)
 post_save.connect(signal.create_module, sender=ModuleData)
+
+m2m_changed.connect(signal.update_user, sender=User.user_permissions.through)
