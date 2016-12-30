@@ -1,9 +1,7 @@
-from django.dispatch import receiver
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from course_managment.apps import CourseManagmentConfig
+from . import utility
 
-import time
 
 def create_object_permission(app_label, model_name, per_codename, per_name):
     """
@@ -50,3 +48,8 @@ def create_module(sender, instance, **kwargs):
     create_object_permission(app_label='course_managment', model_name=sender.__name__,\
         per_codename=instance.title, \
         per_name='crud | '+instance.title+' :'+str(instance.code)[:18])
+
+
+def pre_save_create_slug(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = utility.create_slug(sender, instance)
