@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = 3G-SuperAdmin
+SPHINXPROJ    = AdminDash
 SOURCEDIR     = .
 BUILDDIR      = _build
 
