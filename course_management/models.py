@@ -13,7 +13,7 @@ name_defination = lambda title, code : title+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 
 # ---Global MSG---
-# Code is primary
+# Code is primary field
 # Order by created date
 
 
