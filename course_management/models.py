@@ -17,7 +17,7 @@ default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 
 class CommonInfo(models.Model):
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, editable=False)
     description = models.TextField(max_length=500)
 
     created = models.DateTimeField(auto_now_add=True)

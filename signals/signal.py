@@ -45,8 +45,8 @@ def create_course(sender, instance,  **kwargs):
     """
     # TODO: Call api when module create
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
-                             per_name='crud | '+instance.title+' :'+str(instance.code)[:18])
+                             per_codename=instance.slug,
+                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
 
 
 def create_subject(sender, instance, **kwargs):
