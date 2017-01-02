@@ -1,8 +1,8 @@
 from django.db import models
-
 import uuid
 
 name_defination = lambda title, code : title+"-"+str(code)[:8]
+
 
 class ClassCategory(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -17,5 +17,6 @@ class ClassCategory(models.Model):
     def __str__(self):
         """Retrun course title and first 8 char"""
         return name_defination(self.title, self.code)
+
 
 # Create your models here.

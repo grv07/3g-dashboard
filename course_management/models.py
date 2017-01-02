@@ -114,11 +114,10 @@ class ModuleData(CommonInfo):
         return name_defination(self.title, self.code)
 
 
-pre_save.connect(signal.pre_save_create_slug, sender=Course)
-pre_save.connect(signal.pre_save_create_slug, sender=Subject)
-pre_save.connect(signal.pre_save_create_slug, sender=Chapter)
-pre_save.connect(signal.pre_save_create_slug, sender=Topic)
-pre_save.connect(signal.pre_save_create_slug, sender=ModuleData)
+# Calls pre save function to create the slug field
+for sender in [Course, Subject, Chapter, Topic, ModuleData]:
+    pre_save.connect(signal.pre_save_create_slug, sender=sender)
+
 # Connect signals with models here ...
 post_save.connect(signal.create_course, sender=Course)
 post_save.connect(signal.create_subject, sender=Subject)
@@ -126,4 +125,6 @@ post_save.connect(signal.create_chapter, sender=Chapter)
 post_save.connect(signal.create_topic, sender=Topic)
 post_save.connect(signal.create_module, sender=ModuleData)
 
+# User permissions edit
 m2m_changed.connect(signal.update_user, sender=User.user_permissions.through)
+post_save.connect(signal.send_mail_on_user_create, sender=User)
