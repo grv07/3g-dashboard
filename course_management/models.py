@@ -7,8 +7,6 @@ from signals import signal
 from django.db.models.signals import post_save, pre_save, m2m_changed
 from django.urls import reverse
 
-# from  django.db.models.signals.m2m_changed import post_add
-
 name_defination = lambda title, code : title+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 

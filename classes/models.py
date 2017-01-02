@@ -5,6 +5,9 @@ name_defination = lambda title, code : title+"-"+str(code)[:8]
 
 
 class ClassCategory(models.Model):
+    """
+    Manage Category Of classes.
+    """
     created = models.DateTimeField(auto_now_add=True)
     
     title = models.CharField(max_length=100, blank=True, default='')
