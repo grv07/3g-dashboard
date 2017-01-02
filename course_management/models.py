@@ -119,4 +119,6 @@ post_save.connect(signal.create_chapter, sender=Chapter)
 post_save.connect(signal.create_topic, sender=Topic)
 post_save.connect(signal.create_module, sender=ModuleData)
 
+# User permissions edit
 m2m_changed.connect(signal.update_user, sender=User.user_permissions.through)
+post_save.connect(signal.send_mail_on_user_create, sender=User)
