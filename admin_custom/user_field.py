@@ -4,11 +4,10 @@ from django import forms
 
 
 class MyUserCreationForm(UserCreationForm):
+    """
+    Form extends  UserCreationForm  for add email field.
+    """
     email = forms.EmailField(label="Email", initial='@gmail.com')
-
-    # def __init__(self, *args, **kwargs):
-    #     self.field['email'].required = True
-    #     super(MyUserCreationForm, self).__init__(*args, **kwargs)
     
     class Meta:
         model = User

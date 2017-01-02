@@ -18,32 +18,34 @@ from g3_dashboard import  settings
 #                       "emails/month for free."})
 
 
-def send_mail(to, subject, msg_body):
+def send_mail(to, subject, msg_body, password=None):
     """
     Call to send email on users email address
     :param to:
     :param subject:
     :param msg_body:
+    :param password:
     :return: True is user mail is send success
     """
-    msg_content = msg_body
-    message = MIMEText(msg_content, 'html')
+    if password:
+        msg_content = msg_body
+        message = MIMEText(msg_content, 'html')
 
-    message['From'] = '3G DashBoard <sender@server>'
-    message['To'] = to
-    message['Cc'] = 'Gaurav Tyagi <gaurav@madmachines.io>'
-    message['Subject'] = subject
+        message['From'] = '3G DashBoard <sender@server>'
+        message['To'] = to
+        message['Cc'] = 'Gaurav Tyagi <gaurav@madmachines.io>'
+        message['Subject'] = subject
 
-    msg_full = message.as_string()
+        msg_full = message.as_string()
 
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.starttls()
-    try:
-        server.login('gaurav@madmachines.io', '@8447&&8447@')
-        server.sendmail('gaurav@madmachines.io',
-                        ['grvtyagi22@gmail.com'],
-                        msg_full)
-    except Exception as e:
-        print(e.args)
-    finally:
-        server.quit()
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.starttls()
+        try:
+            server.login('gaurav@madmachines.io', password)
+            server.sendmail('gaurav@madmachines.io',
+                            ['grvtyagi22@gmail.com'],
+                            msg_full)
+        except Exception as e:
+            print(e.args)
+        finally:
+            server.quit()
