@@ -1,12 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import User
-
 import uuid
 
-from signals import signal
-from django.db.models.signals import post_save, m2m_changed
-
-# from  django.db.models.signals.m2m_changed import post_add
+from django.db.models.signals import post_save, pre_save, m2m_changed
+import global_signal
+from .signals import *
 
 name_defination = lambda title, code : title+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
@@ -18,6 +15,7 @@ default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 
 class CommonInfo(models.Model):
     title = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, editable=False)
     description = models.TextField(max_length=500)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -34,11 +32,8 @@ class Course(CommonInfo):
     """
 
     class_category = models.ForeignKey('classes.ClassCategory', default=default_uuid)
-
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # is_open = models.BooleanField(default=False)
-    
     class Meta(CommonInfo.Meta):
         pass
 
@@ -68,7 +63,7 @@ class Chapter(CommonInfo):
     """
     Chapter class for CRUD
     """
-    chapter = models.ForeignKey('Subject', default=default_uuid)
+    subject = models.ForeignKey('Subject', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
@@ -83,7 +78,7 @@ class Topic(CommonInfo):
     """
     Topic class for CRUD
     """
-    topic = models.ForeignKey('Chapter', default=default_uuid)
+    chapter = models.ForeignKey('Chapter', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
@@ -112,11 +107,19 @@ class ModuleData(CommonInfo):
         """
         return name_defination(self.title, self.code)
 
-# Connect signals with models here ...
-post_save.connect(signal.create_course, sender=Course)
-post_save.connect(signal.create_subject, sender=Subject)
-post_save.connect(signal.create_chapter, sender=Chapter)
-post_save.connect(signal.create_topic, sender=Topic)
-post_save.connect(signal.create_module, sender=ModuleData)
 
-m2m_changed.connect(signal.update_user, sender=User.user_permissions.through)
+# Calls pre save function to create the slug field
+for sender in [Course, Subject, Chapter, Topic, ModuleData]:
+    pre_save.connect(signal.pre_save_create_slug, sender=sender)
+
+# Connect global_signals with models here ...
+post_save.connect(create_course, sender=Course)
+post_save.connect(create_subject, sender=Subject)
+post_save.connect(create_chapter, sender=Chapter)
+post_save.connect(create_topic, sender=Topic)
+post_save.connect(create_module, sender=ModuleData)
+
+
+# User permissions edit
+m2m_changed.connect(global_signal.update_user, sender=User.user_permissions.through)
+post_save.connect(global_signal.send_mail_on_user_create, sender=User)

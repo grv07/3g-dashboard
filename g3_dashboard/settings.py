@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'g3_dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'myproject',
+        'USER': 'myprojectuser',
+        'PASSWORD': 'abcd1234',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -122,3 +126,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# from admin_custom import MyUserCreationForm
+
+MAIL_GUN_API_KEY = 'key-3d91be5330422b6a78f9e9d859010763'
+MAIL_GUN_DNS = 'sandbox3c2172091a0d419e867ec7bf45185cdb.mailgun.org'
+
