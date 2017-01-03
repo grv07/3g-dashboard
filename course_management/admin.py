@@ -7,4 +7,5 @@ admin.site.register(Subject)
 admin.site.register(Chapter)
 admin.site.register(Topic)
 admin.site.register(ModuleData)
+
 # Register your models here.

@@ -1,7 +1,9 @@
 import smtplib
 from email.mime.text import MIMEText
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
 
-from g3_dashboard import  settings
+# from g3_dashboard import  settings
 
 # import requests
 # def send_simple_mail():
@@ -49,3 +51,14 @@ def send_mail(to, subject, msg_body, password=None):
             print(e.args)
         finally:
             server.quit()
+
+
+def create_object_permission(app_label, model_name, per_codename, per_name):
+    """
+    Create permission on every object creations ...
+    """
+    content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
+    permission = Permission.objects.create(codename=per_codename.lower(),
+                                           name=per_name.lower(), content_type=content_type)
+
+    return permission
