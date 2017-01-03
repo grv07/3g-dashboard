@@ -19,7 +19,7 @@ class CommonInfo(models.Model):
     Abstract class for reduce size of lines .. ;)
     """
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, editable=False, default=slug_default)
+    slug = models.SlugField(unique=True, editable=False)
     description = models.TextField(max_length=500)
     created = models.DateTimeField(auto_now_add=True)
 
