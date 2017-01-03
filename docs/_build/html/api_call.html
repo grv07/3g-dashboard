@@ -44,12 +44,13 @@
             
   <div class="section" id="avail-api">
 <h1>Avail API<a class="headerlink" href="#avail-api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-signals.signal">
-<span id="api-functions-integrated-with-content-dashboard"></span><h2>API functions integrated with content dashboard<a class="headerlink" href="#module-signals.signal" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-course_management.signals">
+<span id="api-functions-integrated-with-content-dashboard"></span><h2>API functions integrated with content dashboard<a class="headerlink" href="#module-course_management.signals" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="signals.signal.create_chapter">
-<code class="descclassname">signals.signal.</code><code class="descname">create_chapter</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_chapter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create permission when create a chapter of a subject
+<dt id="course_management.signals.create_chapter">
+<code class="descclassname">course_management.signals.</code><code class="descname">create_chapter</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.create_chapter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create permission when create a chapter of a subject and
+Make a API POST call with chapter JSON.
 :param sender:
 :param instance:
 :param kwargs:
@@ -57,9 +58,10 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.create_course">
-<code class="descclassname">signals.signal.</code><code class="descname">create_course</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_course" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a course permission that allow admin to permit a user for a course
+<dt id="course_management.signals.create_course">
+<code class="descclassname">course_management.signals.</code><code class="descname">create_course</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.create_course" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a course permission that allow admin to permit a user for a course and
+Make a API POST call with course JSON.
 :param sender:
 :param instance:
 :param kwargs:
@@ -67,9 +69,10 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.create_module">
-<code class="descclassname">signals.signal.</code><code class="descname">create_module</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_module" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create permission when create a Module of a topic
+<dt id="course_management.signals.create_module">
+<code class="descclassname">course_management.signals.</code><code class="descname">create_module</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.create_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create permission when create a Module of a topic and
+Make a API POST call with module-data JSON.
 :param sender:
 :param instance:
 :param kwargs:
@@ -77,15 +80,10 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.create_object_permission">
-<code class="descclassname">signals.signal.</code><code class="descname">create_object_permission</code><span class="sig-paren">(</span><em>app_label</em>, <em>model_name</em>, <em>per_codename</em>, <em>per_name</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_object_permission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create permission on every object creations ...</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="signals.signal.create_subject">
-<code class="descclassname">signals.signal.</code><code class="descname">create_subject</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_subject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create permission when create a subject of a course
+<dt id="course_management.signals.create_subject">
+<code class="descclassname">course_management.signals.</code><code class="descname">create_subject</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.create_subject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create permission when create a subject of a course and
+Make a API POST call with subject JSON.
 :param sender:
 :param instance:
 :param kwargs:
@@ -93,9 +91,10 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.create_topic">
-<code class="descclassname">signals.signal.</code><code class="descname">create_topic</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.create_topic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create permission when create a Topic of a chapter
+<dt id="course_management.signals.create_topic">
+<code class="descclassname">course_management.signals.</code><code class="descname">create_topic</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.create_topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create permission when create a Topic of a chapter and
+Make a API POST call with topic JSON.
 :param sender:
 :param instance:
 :param kwargs:
@@ -103,8 +102,28 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.send_mail_on_user_create">
-<code class="descclassname">signals.signal.</code><code class="descname">send_mail_on_user_create</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.send_mail_on_user_create" title="Permalink to this definition">¶</a></dt>
+<dt id="course_management.signals.pre_save_create_slug">
+<code class="descclassname">course_management.signals.</code><code class="descname">pre_save_create_slug</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.pre_save_create_slug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create slug value from object title.
+:param sender:
+:param instance:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="course_management.signals.update_user">
+<code class="descclassname">course_management.signals.</code><code class="descname">update_user</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#course_management.signals.update_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call when user permissions change via admin
+:param sender:
+:param instance:
+:param kwargs:
+:return: Callback Api function when user update</p>
+</dd></dl>
+
+<span class="target" id="module-global_signal"></span><dl class="function">
+<dt id="global_signal.send_mail_on_user_create">
+<code class="descclassname">global_signal.</code><code class="descname">send_mail_on_user_create</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#global_signal.send_mail_on_user_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call on post_save when user create
 :param sender:
 :param instance:
@@ -113,8 +132,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="signals.signal.update_user">
-<code class="descclassname">signals.signal.</code><code class="descname">update_user</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#signals.signal.update_user" title="Permalink to this definition">¶</a></dt>
+<dt id="global_signal.update_user">
+<code class="descclassname">global_signal.</code><code class="descname">update_user</code><span class="sig-paren">(</span><em>sender</em>, <em>instance</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#global_signal.update_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call when user permissions change via admin
 :param sender:
 :param instance:
@@ -134,7 +153,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Avail API</a><ul>
-<li><a class="reference internal" href="#module-signals.signal">API functions integrated with content dashboard</a></li>
+<li><a class="reference internal" href="#module-course_management.signals">API functions integrated with content dashboard</a></li>
 </ul>
 </li>
 </ul>

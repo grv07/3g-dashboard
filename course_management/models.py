@@ -8,23 +8,24 @@ from .signals import *
 
 name_defination = lambda title, code : title+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
-
+slug_default = 'ERROR'
 # ---Global MSG---
 # Code is primary field
 # Order by created date
 
 
 class CommonInfo(models.Model):
+    """
+    Abstract class for reduce size of lines .. ;)
+    """
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, editable=False)
+    slug = models.SlugField(unique=True, editable=False, default=slug_default)
     description = models.TextField(max_length=500)
-
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
         ordering = ('created',)
-        # default_permissions = ()
 
 
 class Course(CommonInfo):
@@ -109,8 +110,10 @@ class ModuleData(CommonInfo):
         return name_defination(self.title, self.code)
 
 
-# Calls pre save function to create the slug field
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
+    """
+    Calls pre-save function to create the slug field
+    """
     pre_save.connect(pre_save_create_slug, sender=sender)
 
 # Connect global_signals with models here ...
