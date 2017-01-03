@@ -1,7 +1,10 @@
 import smtplib
 from email.mime.text import MIMEText
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
+from django.utils.text import slugify
 
-from g3_dashboard import  settings
+# from g3_dashboard import  settings
 
 # import requests
 # def send_simple_mail():
@@ -49,3 +52,32 @@ def send_mail(to, subject, msg_body, password=None):
             print(e.args)
         finally:
             server.quit()
+
+
+def create_object_permission(app_label, model_name, per_codename, per_name):
+    """
+    Create permission on every object creations ...
+    """
+    content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
+    permission = Permission.objects.create(codename=per_codename.lower(),
+                                           name=per_name.lower(), content_type=content_type)
+
+    return permission
+
+
+def create_slug(sender, instance, new_slug=None):
+    """
+    Recursive function to check duplicate slug and create new slug from instance title.
+    :param sender:
+    :param instance:
+    :param new_slug:
+    :return:
+    """
+    slug = slugify(instance.title)
+    if new_slug is not None:
+        slug = new_slug
+    qs = sender.objects.filter(slug=slug).order_by('-id')
+    if qs.exists():
+        new_slug = '%s-%s' %(slug, qs.count())
+        return create_slug(sender, instance, new_slug=new_slug)
+    return slug
