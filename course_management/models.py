@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, m2m_changed
 import global_signal
 from .signals import *
@@ -110,7 +111,7 @@ class ModuleData(CommonInfo):
 
 # Calls pre save function to create the slug field
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
-    pre_save.connect(signal.pre_save_create_slug, sender=sender)
+    pre_save.connect(pre_save_create_slug, sender=sender)
 
 # Connect global_signals with models here ...
 post_save.connect(create_course, sender=Course)
