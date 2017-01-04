@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, pre_save, m2m_changed
 import global_signal
 from .signals import *
 
-name_defination = lambda title, code : title+"-"+str(code)[:8]
+name_defination = lambda slug, code : slug+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 slug_default = 'ERROR'
 # ---Global MSG---
@@ -19,7 +19,7 @@ class CommonInfo(models.Model):
     Abstract class for reduce size of lines .. ;)
     """
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, editable=False, default=slug_default)
+    slug = models.SlugField(editable=False)
     description = models.TextField(max_length=500)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -40,8 +40,8 @@ class Course(CommonInfo):
         pass
 
     def __str__(self):
-        """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)
+        """Retrun slug and first 8 char"""
+        return name_defination(self.slug, self.code)
 
 
 class Subject(CommonInfo):
@@ -56,9 +56,9 @@ class Subject(CommonInfo):
 
     def __str__(self):
         """
-        Return title and first 8 char
+        Return slug and first 8 char
         """
-        return name_defination(self.title, self.code)
+        return name_defination(self.slug, self.code)
 
 
 class Chapter(CommonInfo):
@@ -72,8 +72,8 @@ class Chapter(CommonInfo):
         pass
 
     def __str__(self):
-        """Retrun title and first 8 char"""
-        return name_defination(self.title, self.code)
+        """Retrun slug and first 8 char"""
+        return name_defination(self.slug, self.code)
 
 
 class Topic(CommonInfo):
@@ -88,9 +88,9 @@ class Topic(CommonInfo):
 
     def __str__(self):
         """
-        Return title and first 8 char
+        Return slug and first 8 char
         """
-        return name_defination(self.title, self.code)  
+        return name_defination(self.slug, self.code)
 
 
 class ModuleData(CommonInfo):
@@ -105,9 +105,9 @@ class ModuleData(CommonInfo):
 
     def __str__(self):
         """
-        Return title and first 8 char
+        Return slug and first 8 char
         """
-        return name_defination(self.title, self.code)
+        return name_defination(self.slug, self.code)
 
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
@@ -115,6 +115,7 @@ for sender in [Course, Subject, Chapter, Topic, ModuleData]:
     Calls pre-save function to create the slug field
     """
     pre_save.connect(pre_save_create_slug, sender=sender)
+
 
 # Connect global_signals with models here ...
 post_save.connect(create_course, sender=Course)
