@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'classes',
     'course_management',
+    'content_uploader',
 ]
 
 MIDDLEWARE = [
@@ -77,8 +78,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'g3_dashboard.wsgi.application'
 
-
 # Database
+AUTH_USER_MODEL = 'classes.MyUser'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
