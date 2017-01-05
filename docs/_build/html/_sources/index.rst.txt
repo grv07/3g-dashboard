@@ -14,3 +14,8 @@ Welcome to Admin Dash's documentation!
    model_code
 
    api_call
+
+.. toctree::
+   :maxdepth: 2
+
+   custom_admin
