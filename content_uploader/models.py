@@ -1,8 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Uploader(models.Model):
-    owner = models.IntegerField()
-    user = models.OneToOneField(User)
+    """
+    Uploader model for handle CRUD on uploading.
+    """
+    # TODO: Add some extra fields
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+
 # Create your models here.

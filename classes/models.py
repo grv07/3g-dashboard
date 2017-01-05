@@ -1,11 +1,12 @@
 from django.db import models
 import uuid
 
-# from django.contrib.auth.models import AbstractUser
-#
-#
-# class UserProfile(AbstractUser):
-#     pass
+from django.contrib.auth.models import AbstractUser
+
+
+class MyUser(AbstractUser):
+    owner = models.IntegerField(null=True)
+    # REQUIRED_FIELDS = ['owner']
 
 
 class ClassCategory(models.Model):
