@@ -1,8 +1,7 @@
 from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
-from utils import send_mail, create_slug
-from constants import mail_template_constants
+from utils import create_slug
 
 
 def update_user(sender, instance, **kwargs):

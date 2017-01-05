@@ -61,7 +61,6 @@ def create_object_permission(app_label, model_name, per_codename, per_name):
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
     permission = Permission.objects.create(codename=per_codename.lower(),
                                            name=per_name.lower(), content_type=content_type)
-
     return permission
 
 
@@ -77,6 +76,7 @@ def create_slug(sender, instance, new_slug=None):
     if new_slug is not None:
         slug = new_slug
     qs = sender.objects.filter(slug=slug).order_by('-id')
+    print(slug, '###########')
     if qs.exists():
         new_slug = '%s-%s' %(slug, qs.count())
         return create_slug(sender, instance, new_slug=new_slug)

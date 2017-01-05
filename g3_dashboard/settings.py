@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import configparser
+
+config = configparser.ConfigParser()
+config.read('local_db_config.ini', encoding='utf-8')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'classes',
     'course_management',
+    'content_uploader',
 ]
 
 MIDDLEWARE = [
@@ -73,18 +78,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'g3_dashboard.wsgi.application'
 
-
 # Database
+AUTH_USER_MODEL = 'classes.MyUser'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'myproject',
-        'USER': 'myprojectuser',
-        'PASSWORD': 'abcd1234',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': config["DATABASE"]["ENGINE"],
+        'NAME': config["DATABASE"]["NAME"],
+        'USER': config["DATABASE"]["USER"],
+        'PASSWORD': config["DATABASE"]["PASSWORD"],
+        'HOST': config["DATABASE"]["HOST"],   # Or an IP Address that your DB is hosted on
+        'PORT': config["DATABASE"]["PORT"],
     }
 }
 
