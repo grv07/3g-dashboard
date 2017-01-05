@@ -8,7 +8,6 @@ from .signals import *
 
 name_defination = lambda slug, code : slug+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
-slug_default = 'ERROR'
 # ---Global MSG---
 # Code is primary field
 # Order by created date
@@ -32,7 +31,6 @@ class Course(CommonInfo):
     """
     Course class for CRUD
     """
-
     class_category = models.ForeignKey('classes.ClassCategory', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

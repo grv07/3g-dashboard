@@ -11,6 +11,7 @@ class UploaderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """
         Filter for show users that are own by request.user.
+
         :param request:
         :return:
         """
@@ -21,7 +22,10 @@ class UploaderAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         """
-        Filter user list according to owner access.
+        Filter user list
+
+        return all avail_users for uploader creation.
+
         :param request:
         :param obj:
         :param kwargs:

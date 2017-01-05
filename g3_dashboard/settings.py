@@ -63,7 +63,7 @@ ROOT_URLCONF = 'g3_dashboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/home/kalle/g3_admindash/g3_dashboard/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
