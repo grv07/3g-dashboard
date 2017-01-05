@@ -16,13 +16,14 @@ class MyUserAdmin(UserAdmin):
     This relation is important to read before any change:
 
     save_model: call on save a user object.
+
     get_queryset: Use to filter owners user.
 
     """
-
     def save_model(self, request, obj, form, change):
         """
-        Use to add owner user on creation to a every user in admin dashboard system.
+        Add owner value on every user object.
+
         :param request:
         :param obj:
         :param form:
@@ -34,7 +35,11 @@ class MyUserAdmin(UserAdmin):
 
     def get_queryset(self, request):
         """
-        If user is admin can see every one otherwise filter only created users.
+        If  user is super-admin:
+            return all Users
+        else:
+            return only created users by request.user.
+
         :param request:
         :return: queryset
         """
@@ -51,7 +56,12 @@ class MyUserAdmin(UserAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         """
-        Filter permission list according to users access
+        Filter permission list.
+
+        if user is super-admin:
+            can see or select from all permissions avail.
+        elif user is admin:
+            can select or allow his own restricted permissions to any other user.
         :param request:
         :param obj:
         :param kwargs:
