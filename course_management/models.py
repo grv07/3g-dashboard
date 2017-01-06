@@ -8,7 +8,7 @@ from .signals import *
 from django.contrib.admin.models import LogEntry
 
 
-name_defination = lambda slug, code : slug+"-"+str(code)[:8]
+name_defination = lambda slug, parent_title : slug+"-"+str(parent_title)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
 # Code is primary field
@@ -41,7 +41,7 @@ class Course(CommonInfo):
 
     def __str__(self):
         """Retrun slug and first 8 char"""
-        return name_defination(self.slug, self.code)
+        return name_defination(self.slug, self.class_category)
 
 
 class Subject(CommonInfo):
@@ -58,7 +58,7 @@ class Subject(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.code)
+        return name_defination(self.slug, self.course.slug)
 
 
 class Chapter(CommonInfo):
@@ -73,7 +73,7 @@ class Chapter(CommonInfo):
 
     def __str__(self):
         """Retrun slug and first 8 char"""
-        return name_defination(self.slug, self.code)
+        return name_defination(self.slug, self.subject.slug)
 
 
 class Topic(CommonInfo):
@@ -90,7 +90,7 @@ class Topic(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.code)
+        return name_defination(self.slug, self.chapter.slug)
 
 
 class ModuleData(CommonInfo):
@@ -107,7 +107,7 @@ class ModuleData(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.code)
+        return name_defination(self.slug, self.topic.slug)
 
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
