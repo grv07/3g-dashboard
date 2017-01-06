@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'classes',
     'course_management',
     'content_uploader',
+    'logentry_admin',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'g3_dashboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/home/kalle/g3_admindash/g3_dashboard/templates'],
+        'DIRS': [BASE_DIR+'/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

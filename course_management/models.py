@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, m2m_changed
 import global_signal
 from .signals import *
+from django.contrib.admin.models import LogEntry
+
 
 name_defination = lambda slug, code : slug+"-"+str(code)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
@@ -116,6 +118,8 @@ for sender in [Course, Subject, Chapter, Topic, ModuleData]:
 
 
 # Connect global_signals with models here ...
+pre_save.connect(global_signal.change_log_msg, sender=LogEntry)
+
 post_save.connect(create_course, sender=Course)
 post_save.connect(create_subject, sender=Subject)
 post_save.connect(create_chapter, sender=Chapter)
