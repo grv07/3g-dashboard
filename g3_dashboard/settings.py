@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'classes',
     'course_management',
     'content_uploader',
+    'logentry_admin',
 ]
 
 MIDDLEWARE = [

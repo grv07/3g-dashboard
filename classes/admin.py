@@ -1,14 +1,20 @@
-from django.contrib import admin
+# from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib import admin
 from admin_custom.user_field import MyUserCreationForm
 from .models import ClassCategory
 from classes.models import MyUser
 
+# from django.contrib.admin.models import LogEntry
 
 admin.site.register(ClassCategory)
 
 # Unique email field of user
 # User._meta.get_field('email')._unique = True
+
+
+# class LogEntryAdmin(admin.ModelAdmin):
+#     list_display = ('object_repr', 'change_message', 'user',)
 
 
 class MyUserAdmin(UserAdmin):
@@ -81,4 +87,5 @@ class MyUserAdmin(UserAdmin):
     add_form = MyUserCreationForm
 
 admin.site.register(MyUser, MyUserAdmin)
+# admin.site.register(LogEntry, LogEntryAdmin)
 # Register your models here.

@@ -32,3 +32,8 @@ def send_mail_on_user_create(sender, instance, **kwargs):
     register_body_template = register_body_template.format(user_name=instance.username, password=instance.password)
     send_mail(instance.email, register_subject, register_body_template)
 
+
+def change_log_msg(sender, instance, **kwargs):
+    msg = "Has been changed by {user}".\
+        format(**{'user': instance.user})
+    instance.change_message = msg
