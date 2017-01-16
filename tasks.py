@@ -4,9 +4,10 @@ base_dir = "feb_test"
 
 local_env_settings = {
     "server_name": "ubuntu",
-    "host": "demo",
-    "pem_file_path": "path/to/pem"
+    "host": "52.79.170.101",
+    "pem_file_path": "Downloads/3g_admin_panel.pem"
 }
+
 
 server_login_string = "ssh -i {pem_file_path} {server_name}:{host}"
 server_dump_string = "TODO"
@@ -16,6 +17,7 @@ server_dump_string = "TODO"
 def connect_to_server(ctx):
     print("Start requirement install")
     print(server_login_string.format(**local_env_settings))
+    ctx.run("sudo ssh -i ~/Downloads/3g_admin_panel.pem ubuntu@52.79.170.101")
     print("::::::: Requirement installation is Done :::::::")
 
 
