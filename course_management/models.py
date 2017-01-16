@@ -8,7 +8,7 @@ from .signals import *
 from django.contrib.admin.models import LogEntry
 
 
-name_defination = lambda slug, parent_title : slug+"-"+str(parent_title)[:8]
+name_defination = lambda slug, parent_title: slug+"-"+str(parent_title)[:8]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
 # Code is primary field
@@ -101,7 +101,7 @@ class ModuleData(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        pass
+        verbose_name_plural = "Module(s) Data"
 
     def __str__(self):
         """
