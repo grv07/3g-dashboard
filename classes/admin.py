@@ -2,12 +2,13 @@
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
 from admin_custom.user_field import MyUserCreationForm
-from .models import ClassCategory
+from .models import ClassCategory, BoardCategory
 from classes.models import MyUser
 
 # from django.contrib.admin.models import LogEntry
 
 admin.site.register(ClassCategory)
+admin.site.register(BoardCategory)
 
 # Unique email field of user
 # User._meta.get_field('email')._unique = True
