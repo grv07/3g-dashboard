@@ -2,6 +2,7 @@ from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
 from utils import create_slug
+from django.utils.text import slugify
 
 
 def update_user(sender, instance, **kwargs):
@@ -29,7 +30,6 @@ def create_course(sender, instance,  **kwargs):
     :param kwargs:
     :return: Call back API function when create a course
     """
-    print('done ....', instance.slug)
     from .serializers import CourseSerializer
     obj_serializer = CourseSerializer(instance)
     print(obj_serializer.data)
@@ -119,6 +119,6 @@ def pre_save_create_slug(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    if not instance.slug:
+    if not instance.slug == slugify(instance.title):
         instance.slug = create_slug(sender, instance)
 
