@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'course_management',
     'content_uploader',
     'logentry_admin',
+    'task_management',
 ]
 
 MIDDLEWARE = [
