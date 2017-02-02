@@ -29,7 +29,10 @@ SECRET_KEY = '-_^arft-d@_&w_er6m(a-%&c94++cewk=ro#^w&8f&j-a4-=qh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    config.read('server_db_config.ini', encoding='utf-8')
+
+ALLOWED_HOSTS = ['52.79.170.101', '*']
 
 
 # Application definition
@@ -134,7 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # from admin_custom import MyUserCreationForm
 
 MAIL_GUN_API_KEY = 'key-3d91be5330422b6a78f9e9d859010763'
