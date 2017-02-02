@@ -10,6 +10,10 @@ default_slug = 'Hello'
 
 class MyUser(AbstractUser):
     owner = models.IntegerField(null=True)
+    department = models.CharField(max_length=200, help_text="Required. Max 200 characters for department name.")
+    employee_number = models.CharField(max_length=100, help_text="Required. Max 100 characters for employee number.")
+    employee_designation = models.CharField(max_length=300, help_text="Required.  Max"
+                                                                      " 300 characters for employee number.")
     # REQUIRED_FIELDS = ['owner']
 
 
@@ -44,7 +48,8 @@ class ClassCategory(models.Model):
 
     class Meta:
         ordering = ('created',)
-        verbose_name_plural = "Class Categories"
+        verbose_name_plural = "Grades"
+        verbose_name = "Grade"
 
     def __str__(self):
         """Return course title and first 8 char"""
