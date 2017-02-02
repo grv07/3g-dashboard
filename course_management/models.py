@@ -37,7 +37,7 @@ class Course(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        pass
+        verbose_name_plural = "1. Course"
 
     def __str__(self):
         """Retrun slug and first 8 char"""
@@ -52,7 +52,7 @@ class Subject(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        pass
+        verbose_name_plural = "2. Subject"
 
     def __str__(self):
         """
@@ -69,10 +69,10 @@ class Chapter(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        pass
+        verbose_name_plural = "3. Chapter"
 
     def __str__(self):
-        """Retrun slug and first 8 char"""
+        """Return slug and first 8 char"""
         return name_defination(self.slug, self.subject.slug)
 
 
@@ -84,7 +84,7 @@ class Topic(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        pass
+        verbose_name_plural = "4. Concept"
 
     def __str__(self):
         """
@@ -101,7 +101,7 @@ class ModuleData(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        verbose_name_plural = "Module(s) Data"
+        verbose_name_plural = "5. Module(s) Data"
 
     def __str__(self):
         """

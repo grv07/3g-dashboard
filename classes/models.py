@@ -6,6 +6,10 @@ from django.contrib.auth.models import AbstractUser
 
 class MyUser(AbstractUser):
     owner = models.IntegerField(null=True)
+    department = models.CharField(max_length=200, help_text="Required. Max 200 characters for department name.")
+    employee_number = models.CharField(max_length=100, help_text="Required. Max 100 characters for employee number.")
+    employee_designation = models.CharField(max_length=300, help_text="Required.  Max"
+                                                                      " 300 characters for employee number.")
     # REQUIRED_FIELDS = ['owner']
 
 
