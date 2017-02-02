@@ -7,7 +7,7 @@ class MyUserCreationForm(UserCreationForm):
     """
     Form extends  UserCreationForm  for add email field.
     """
-    email = forms.EmailField(label="Email", initial='@gmail.com')
+    email = forms.EmailField(label="Email", initial='@3gl.me')
     # owner = forms.IntegerField(label="Owner", required=False)
 
     class Meta:

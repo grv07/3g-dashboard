@@ -39,7 +39,8 @@ class ClassCategory(models.Model):
 
     class Meta:
         ordering = ('created',)
-        verbose_name_plural = "Class Categories"
+        verbose_name_plural = "Grades"
+        verbose_name = "Grade"
 
     def __str__(self):
         """Return course title and first 8 char"""
