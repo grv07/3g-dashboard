@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/admin')),
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^tasks/', include('task_management.urls')),
+    url(r'^tasks/', include('task_management.urls'), name='tasks'),
 ]
 
 
