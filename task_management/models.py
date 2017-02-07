@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
-from content_uploader.models import Uploader
 
-from datetime import datetime
+from content_uploader.models import Uploader
+from classes.models import MyUser
 
 status_fields = [('ASSIGN', 'assign'), ('COMPLETE', 'complete')]
 
@@ -16,6 +16,7 @@ class Task(models.Model):
     description = models.TextField(max_length=1000, blank=False)
     status = models.CharField(choices=status_fields, max_length=10, default='pp')
     assign_to = models.ForeignKey(Uploader)
+    assigned_by = models.ForeignKey(MyUser, default=11)
     assigned_on = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField(default=timezone.now, blank=True)
 

@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, get_user_model, login, logout
 from .forms import UserLoginForm
 from .models import Task
 from content_uploader.models import Uploader
+from classes.models import MyUser
 
 
 def login_user(request):
@@ -21,17 +22,25 @@ def login_user(request):
             user = authenticate(username=username, password=password)
             if user.is_active:
                 login(request, user)
-                return redirect('/tasks/dashboard')
+                if user.is_staff:
+                        return redirect('/tasks/admin_dashboard')
+                else:
+                    return redirect('/tasks/dashboard')
             else:
                 return render(request, 'login.html', {'error_message': 'Account disabled'})
     else:
         return render(request, 'login.html')
 
 
-def dashboard(request):
+def uploader_dashboard(request):
     uploader = Uploader.objects.filter(user_id=request.user.id).values_list('id', flat=True).get()
     tasks = Task.objects.filter(assign_to_id=uploader)
     return render(request, 'dashboard.html', {'tasks': tasks})
+
+
+# def admin_dashboard(request):
+
+
 
 
 def logout_user(request):
@@ -54,3 +63,4 @@ def edit_task(request, task_id):
     """
     user = request.user
     task = get_object_or_404(Task, pk=task_id)
+
