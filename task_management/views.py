@@ -38,9 +38,10 @@ def uploader_dashboard(request):
     return render(request, 'dashboard.html', {'tasks': tasks})
 
 
-# def admin_dashboard(request):
-
-
+def admin_dashboard(request):
+    print('admin id:' + str(request.user.id))
+    tasks = Task.objects.filter(assigned_by_id=request.user.id)
+    return render(request, 'dashboard.html', {'tasks': tasks})
 
 
 def logout_user(request):
