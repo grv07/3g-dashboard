@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.db.models import Q
 
 from .forms import UserLoginForm
 from .models import Task
@@ -25,7 +26,7 @@ def login_user(request):
                 if user.is_staff:
                         return redirect('/tasks/admin_dashboard')
                 else:
-                    return redirect('/tasks/dashboard')
+                    return redirect('task_management:dashboard')
             else:
                 return render(request, 'login.html', {'error_message': 'Account disabled'})
     else:
@@ -41,6 +42,8 @@ def uploader_dashboard(request):
 def admin_dashboard(request):
     print('admin id:' + str(request.user.id))
     tasks = Task.objects.filter(assigned_by_id=request.user.id)
+    perm = Permission.objects.filter()
+    print(perm)
     return render(request, 'dashboard.html', {'tasks': tasks})
 
 
