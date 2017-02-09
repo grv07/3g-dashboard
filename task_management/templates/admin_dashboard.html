@@ -10,14 +10,16 @@
                       <p>{{ task.description }}</p>
                     </div>
                     <div class="card-action">
-                      <a href="{% url 'task_management:task' task.id%}">Open task</a>
-                      <a href="#">Mark as complete</a>
-                      <!--<a href="#">Mark as Maa chuda</a>-->
+                        <a href="{% url 'task_management:task' task.id%}">Open task</a>
+                        <a href="{% url 'task_management:delete_task' task.id%}">Delete Task</a>
+                        <!--<a href="#">Mark as complete</a>-->
                     </div>
                   </div>
                 </div>
             </div>
         {% endfor %}
+    {% else %}
+        <h3>No Tasks</h3>
     {% endif %}
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
 {% endblock %}
