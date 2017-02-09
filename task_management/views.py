@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.http import Http404
 from django.db.models import Q
 
-from .forms import UserLoginForm
+from .forms import UserLoginForm, TaskAssignForm
 from .models import Task
 from content_uploader.models import Uploader
 from classes.models import MyUser
@@ -57,10 +57,19 @@ def uploader_dashboard(request):
 
 
 def admin_dashboard(request):
-    print('************ We are in admin dashboard *****************')
     tasks = Task.objects.filter(assigned_by_id=request.user.id)
     perm = Permission.objects.filter(user=request.user)
     return render(request, 'admin_dashboard.html', {'tasks': tasks})
+
+
+def assign_task(request):
+    form = TaskAssignForm(request.POST or None)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.assigned_by = request.user.id
+        instance.save()
+        return redirect('task_management:admin_dashboard')
+    return render(request, 'assign_task.html', {'form': form})
 
 
 def edit_task(request, task_id):
@@ -83,11 +92,7 @@ def delete_task(request, task_id):
     """
     if request.user.is_staff or request.user.is_superuser:
         task = get_object_or_404(Task, pk=task_id)
-        print('done till here 1')
         task.delete()
-        print('done till here 2')
-        tasks = Task.objects.filter(assigned_by_id=request.user.id)
-        print('************', tasks)
-        return render(request, 'admin_dashboard.html', {'tasks': tasks})
+        return redirect('task_management:admin_dashboard')
     else:
         raise Http404

@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^dashboard/$', views.uploader_dashboard, name='dashboard'),
     url(r'^admin_dashboard/$', views.admin_dashboard, name='admin_dashboard'),
     url(r'^(?P<task_id>[0-9]+)/$', views.edit_task, name='task'),
+    url(r'^assign_task$', views.assign_task, name='assign_task'),
     url(r'^(?P<task_id>[0-9]+)/delete/$', views.delete_task, name='delete_task')
 ]
