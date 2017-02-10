@@ -143,3 +143,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MAIL_GUN_API_KEY = 'key-3d91be5330422b6a78f9e9d859010763'
 MAIL_GUN_DNS = 'sandbox3c2172091a0d419e867ec7bf45185cdb.mailgun.org'
 
+
+

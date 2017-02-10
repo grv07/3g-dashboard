@@ -19,6 +19,21 @@ def update_user(sender, instance, **kwargs):
         print('pre add call')
 
 
+def change_user_type(sender, instance, **kwargs):
+    """
+    Change type of user
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    if instance.is_staff:
+        instance.type = 'ADMIN'
+    if instance.is_superuser:
+        instance.type = 'SUPER-ADMIN'
+    print('update/create user call ...')
+
+
 def send_mail_on_user_create(sender, instance, **kwargs):
     """
     Call on post_save when user create

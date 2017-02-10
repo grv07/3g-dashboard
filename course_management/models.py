@@ -2,13 +2,13 @@ from django.db import models
 import uuid
 
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, m2m_changed
+from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delete
 import global_signal
 from .signals import *
 from django.contrib.admin.models import LogEntry
+from classes.models import MyUser
 
-
-name_defination = lambda slug, parent_title: slug+"-"+str(parent_title)[:18]
+name_defination = lambda title, parent_title: title+" | "+str(parent_title)[:18]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
 # Code is primary field
@@ -37,11 +37,12 @@ class Course(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
-        verbose_name_plural = "1. Course"
+        verbose_name_plural = "1. Stream"
+        verbose_name = "Stream"
 
     def __str__(self):
         """Retrun slug and first 8 char"""
-        return name_defination(self.slug, self.class_category)
+        return name_defination(self.title, self.class_category)
 
 
 class Subject(CommonInfo):
@@ -58,7 +59,7 @@ class Subject(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.course.slug)
+        return name_defination(self.title, self.course.title)
 
 
 class Chapter(CommonInfo):
@@ -73,7 +74,7 @@ class Chapter(CommonInfo):
 
     def __str__(self):
         """Return slug and first 8 char"""
-        return name_defination(self.slug, self.subject.slug)
+        return name_defination(self.title, self.subject.title)
 
 
 class Topic(CommonInfo):
@@ -90,7 +91,7 @@ class Topic(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.chapter.slug)
+        return name_defination(self.title, self.chapter.title)
 
 
 class ModuleData(CommonInfo):
@@ -107,7 +108,7 @@ class ModuleData(CommonInfo):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.slug, self.topic.slug)
+        return name_defination(self.title, self.topic.title)
 
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
@@ -115,6 +116,7 @@ for sender in [Course, Subject, Chapter, Topic, ModuleData]:
     Calls pre-save function to create the slug field
     """
     pre_save.connect(pre_save_create_slug, sender=sender)
+    pre_delete.connect(delete_object_permission, sender=sender)
 
 
 # Connect global_signals with models here ...
@@ -126,6 +128,7 @@ post_save.connect(create_chapter, sender=Chapter)
 post_save.connect(create_topic, sender=Topic)
 post_save.connect(create_module, sender=ModuleData)
 
+pre_save.connect(global_signal.change_user_type, sender=MyUser)
 
 # User permissions edit
 m2m_changed.connect(global_signal.update_user, sender=User.user_permissions.through)

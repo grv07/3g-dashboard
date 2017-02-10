@@ -10,6 +10,9 @@ class MyUser(AbstractUser):
     employee_number = models.CharField(max_length=100, help_text="Required. Max 100 characters for employee number.")
     employee_designation = models.CharField(max_length=300, help_text="Required.  Max"
                                                                       " 300 characters for employee number.")
+    type = models.CharField(choices=[('DEFAULT', 'default',), ('STUDENT', 'student',), ('TEACHER', 'teacher',),
+                                     ('UPLOADER', 'uploader'), ('ADMIN', 'admin',),
+                                     ('SUPER-ADMIN', 'super-admin')], max_length=20, default='DEFAULT')
     # REQUIRED_FIELDS = ['owner']
 
 

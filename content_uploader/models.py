@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
 
+from django.db.models.signals import pre_save
+from .signal import create_user_to_uploader
+
 
 class Uploader(models.Model):
     """
@@ -12,4 +15,5 @@ class Uploader(models.Model):
     def __str__(self):
         return self.user.username
 
+pre_save.connect(create_user_to_uploader, sender=Uploader)
 # Create your models here.

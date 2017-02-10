@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
-from utils import create_slug
+from utils import create_slug, get_permission_name
 from django.utils.text import slugify
 
 
@@ -36,7 +36,7 @@ def create_course(sender, instance,  **kwargs):
     # TODO: Call api when module create
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+                             per_name=get_permission_name(instance))
 
 
 def create_subject(sender, instance, **kwargs):
@@ -54,7 +54,7 @@ def create_subject(sender, instance, **kwargs):
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+                             per_name=get_permission_name(instance))
 
 
 def create_chapter(sender, instance, **kwargs):
@@ -72,7 +72,7 @@ def create_chapter(sender, instance, **kwargs):
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+                             per_name=get_permission_name(instance))
 
 
 def create_topic(sender, instance, **kwargs):
@@ -90,7 +90,7 @@ def create_topic(sender, instance, **kwargs):
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+                             per_name=get_permission_name(instance))
 
 
 def create_module(sender, instance, **kwargs):
@@ -108,7 +108,7 @@ def create_module(sender, instance, **kwargs):
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+                             per_name=get_permission_name(instance))
 
 
 def pre_save_create_slug(sender, instance, **kwargs):
@@ -122,3 +122,16 @@ def pre_save_create_slug(sender, instance, **kwargs):
     if not instance.slug == slugify(instance.title):
         instance.slug = create_slug(sender, instance)
 
+
+def delete_object_permission(sender, instance, **kwargs):
+    """
+    Delete a permission when delete model object
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    permission = Permission.objects.get(
+        codename=instance.slug.lower(),
+        name=get_permission_name(instance).lower())
+    permission.delete()

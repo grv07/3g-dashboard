@@ -1,7 +1,8 @@
 # from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
-from admin_custom.user_field import MyUserCreationForm
+from django.forms import widgets
+from admin_custom.user_field import MyUserCreationForm, MyUserChangeForm
 from .models import ClassCategory, BoardCategory
 from classes.models import MyUser
 
@@ -59,8 +60,10 @@ class MyUserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('username', 'email', 'employee_number', 'employee_designation', 'password1',
-                       'password2', 'department')}),
+                       'password2', 'department', 'type')}),
     )
+
+    list_display = ('username', 'email', 'first_name', 'last_name', 'type')
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -82,10 +85,13 @@ class MyUserAdmin(UserAdmin):
             if request.user.is_superuser:
                 permissions.queryset = permissions.queryset.all()
             else:
+                form.base_fields['is_active'].widget = widgets.HiddenInput()
+                form.base_fields['is_staff'].widget = widgets.HiddenInput()
+                form.base_fields['is_superuser'].widget = widgets.HiddenInput()
                 permissions.queryset = permissions.queryset.filter(user=request.user)
 
         return form
-
+    form = MyUserChangeForm
     add_form = MyUserCreationForm
 
 admin.site.register(MyUser, MyUserAdmin)
