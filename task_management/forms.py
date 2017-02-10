@@ -8,6 +8,9 @@ class UserLoginForm(forms.Form):
 
 
 class TaskAssignForm(forms.Form):
+    title = forms.CharField(required=True)
+    description = forms.CharField(required=True)
+    due_date = forms.DateField(required=True)
 
     class Meta:
         model = Task
