@@ -23,6 +23,7 @@ class MyUserChangeForm(UserChangeForm):
         super(UserChangeForm, self).__init__(*args, **kwargs)
         self.fields['is_staff'].label = 'Mark as Admin'
         self.fields['is_superuser'].label = 'Mark as SuperUser'
+        self.fields['user_permissions'].widget.attrs.update({'class': 'myfieldclass'})
 
     # class Meta:
     #     model = User
