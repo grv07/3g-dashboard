@@ -16,7 +16,7 @@ Permission.__str__ = custom
 
 
 def get_permission_name(instance):
-    return 'crud | '+instance.slug+' :'+str(instance.code)[:18]
+    return 'crud | '+instance.title+' :'+str(instance.code)[:18]
 
 # from g3_dashboard import  settings
 
