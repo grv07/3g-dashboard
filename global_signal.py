@@ -13,8 +13,11 @@ def update_user(sender, instance, **kwargs):
     """
     # Post add of permission.
     if kwargs.get('action', None) == 'post_add':
-        permissions = Permission.objects.filter(user=instance)
-        # TODO: Call api when update user permissions
+        try:
+            permissions = Permission.objects.filter(user=instance)
+            # TODO: Call api when update user permissions
+        except Exception as e:
+            print(e.args)
     else:
         print('pre add call')
 

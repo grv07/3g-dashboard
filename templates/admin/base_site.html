@@ -1,9 +1,7 @@
 {% extends "admin/base.html" %}
+{% load i18n static %}
 
 {% block title %}{{ title }} | 3G Admin-Dash Board {% endblock %}
-{% block extrahead %}
-<link rel="stylesheet" type="text/css" href="../../assests/custom/custom_css.css" />
-{% endblock %}
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">3G Admin Dash Board</a></h1>
 {% endblock %}

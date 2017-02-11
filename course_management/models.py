@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delet
 import global_signal
 from .signals import *
 from django.contrib.admin.models import LogEntry
-from classes.models import MyUser
+from content_uploader.models import MyUser
 
 name_defination = lambda title, parent_title: title+" | "+str(parent_title)[:18]
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'

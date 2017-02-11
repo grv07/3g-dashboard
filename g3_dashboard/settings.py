@@ -47,9 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'content_uploader',
     'classes',
     'course_management',
-    'content_uploader',
     'logentry_admin',
 ]
 
@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'classes.MyUser'
+AUTH_USER_MODEL = 'content_uploader.MyUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
