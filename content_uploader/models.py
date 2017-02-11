@@ -20,6 +20,9 @@ class MyUser(AbstractUser):
                                      ('SUPER-ADMIN', 'super-admin')], max_length=20, default='DEFAULT')
     # REQUIRED_FIELDS = ['owner']
 
+    class Meta:
+        verbose_name_plural = "1. User"
+
 
 class Uploader(models.Model):
     """
@@ -27,6 +30,9 @@ class Uploader(models.Model):
     """
     # TODO: Add some extra fields
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
+
+    class Meta:
+        verbose_name_plural = "2. Uploader"
 
     def __str__(self):
         return self.user.username
