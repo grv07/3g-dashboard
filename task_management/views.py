@@ -27,7 +27,7 @@ def login_user(request):
             if user.is_active:
                 login(request, user)
                 if user.is_staff:
-                        return redirect('task_management:admin_dashboard')
+                    return redirect('task_management:admin_dashboard')
 
                 else:
                     return redirect('task_management:dashboard')
@@ -46,8 +46,7 @@ def logout_user(request):
     :return:
     """
     logout(request)
-    form = UserLoginForm(request.POST or None)
-    return render(request, 'login.html', {'form': form})
+    return redirect('task_management:login')
 
 
 def uploader_dashboard(request):
@@ -78,18 +77,21 @@ def assign_task(request):
     :param request:
     :return:
     """
-    print(request.POST)
     form = TaskAssignForm(request.POST or None)
+
     if form.is_valid():
-        # instance = form.save(commit=False)
-        # instance.status = 'ASSIGN'
-        # instance.assigned_by = request.user.id
-        # instance.save()
+        task = form.save(commit=False)
+        task.status = 'ASSIGN'
+        task.assign_to_id = request.POST.get('assign_to')
+        task.assigned_by_id = request.user.id
+        task.save()
         return redirect('task_management:admin_dashboard')
     else:
         print(form)
-    admin_users = MyUser.objects.filter(owner=request.user.id)
-    return render(request, 'assign_task.html', {'form': form, 'admin_users': admin_users})
+        # form = TaskAssignForm()
+
+    uploader_list = Uploader.objects.filter(user__owner=request.user.id)
+    return render(request, 'assign_task.html', {'form': form, 'uploaders': uploader_list})
 
 
 def edit_task(request, task_id):
@@ -99,8 +101,8 @@ def edit_task(request, task_id):
     :param task_id:
     :return:
     """
-    user = request.user
     task = get_object_or_404(Task, pk=task_id)
+    return render(request, 'detail.html', {'task': task})
 
 
 def delete_task(request, task_id):

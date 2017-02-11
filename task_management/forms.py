@@ -7,11 +7,8 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class TaskAssignForm(forms.Form):
-    title = forms.CharField(required=True)
-    description = forms.CharField(required=True)
-    due_date = forms.DateField(required=True)
+class TaskAssignForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'assign_to', 'due_date']
+        fields = ['title', 'description', 'due_date']

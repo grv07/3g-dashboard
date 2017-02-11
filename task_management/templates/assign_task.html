@@ -1,20 +1,20 @@
 {% extends 'home.html' %}
-{% block extend_head%}
+{% block extend_head %}
 <script>
-         $(document).ready(function() {
-         $('select').material_select();
-      });
-      $('.datepicker').pickadate({
-      selectMonths: true, // Creates a dropdown to control month
-      selectYears: 15 // Creates a dropdown of 15 years to control year
-            });
+        $(document).ready(function() {
+            $('select').material_select();
+        });
+        $('.datepicker').pickadate({
+            selectMonths: true,
+            selectYears: 15
+        });
     </script>
-{% endblock%}
+{% endblock %}
 
 {% block body%}
 <div class="container">
     <h1>Assign Task</h1>
-    {% if admin_users %}
+    {% if uploaders %}
     <div class="row">
         <form class="col s8" method="post" action="{% url 'task_management:assign_task' %}">
             {% csrf_token %}
@@ -38,9 +38,9 @@
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
                 <label>Select the uploader</label>
-                <select name="assign_to">
-                    {% for admin_user in admin_users %}
-                        <option value="{{ admin_user.id}}">{{ admin_user.username}}</option>
+                <select name="assign_to" id="assign_to">
+                    {% for uploader in uploaders %}
+                        <option value="{{ uploader.id }}">{{ uploader.user.username }}</option>
                     {% endfor %}
                 </select>
             </div>
