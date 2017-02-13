@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from utils import send_mail
+from utils import send_mail, get_permission_name
 from constants import mail_template_constants
 
 
@@ -22,6 +22,45 @@ def update_user(sender, instance, **kwargs):
         print('pre add call')
 
 
+def update_permission_if_obj_update(sender, instance, **kwargs):
+    """
+    On any-object update, change their relative permission name
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    try:
+        old = sender.objects.get(pk=instance.code)
+        if not get_permission_name(instance) == get_permission_name(old):
+            print('change in permission ...', get_permission_name(old))
+            permission = Permission.objects.get(name=get_permission_name(old))
+            permission.name = get_permission_name(instance)
+            permission.codename = str(instance).lower()
+            permission.save()
+        else:
+            print('No Change in permission ...')
+
+    except Exception as e:
+        print(e.args)
+
+
+def update_user_group(sender, instance, **kwargs):
+    print('-------- When assign group ------')
+    print(kwargs)
+    if type(instance).__name__ == 'Group':
+        print(instance.permissions.all())
+    elif type(instance).__name__ == 'MyUser' and kwargs.get('action') == 'post_add':
+        print(instance.groups.all())
+        for group in instance.groups.all():
+            # print(group)
+            for permission in group.permissions.all():
+                print(permission)
+                # print(instance.user_permissions.add(permission).query)
+                # TO-DO Call a raw sql query for add permissions to user
+                # otherwise create a call-hell via signals ..
+
+
 def change_user_type(sender, instance, **kwargs):
     """
     Change type of user
@@ -30,10 +69,14 @@ def change_user_type(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    if instance.is_staff:
-        instance.type = 'ADMIN'
+
     if instance.is_superuser:
         instance.type = 'SUPER-ADMIN'
+    elif instance.is_staff:
+        instance.type = 'ADMIN'
+    else:
+        if instance.type in ['ADMIN', 'SUPER-ADMIN']:
+            instance.type = 'DEFAULT'
     print('update/create user call ...')
 
 

@@ -8,7 +8,8 @@ from .signals import *
 from django.contrib.admin.models import LogEntry
 from content_uploader.models import MyUser
 
-name_defination = lambda title, parent_title: title+" | "+str(parent_title)[:18]
+from utils import name_definition
+
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
 # Code is primary field
@@ -39,10 +40,11 @@ class Course(CommonInfo):
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "1. Stream"
         verbose_name = "Stream"
+        unique_together = ['title', 'class_category']
 
     def __str__(self):
         """Retrun slug and first 8 char"""
-        return name_defination(self.title, self.class_category)
+        return name_definition(self.title, self.class_category)
 
 
 class Subject(CommonInfo):
@@ -54,12 +56,13 @@ class Subject(CommonInfo):
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "2. Subject"
+        unique_together = ['title', 'course']
 
     def __str__(self):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.title, self.course.title)
+        return name_definition(self.title, self.course)
 
 
 class Chapter(CommonInfo):
@@ -71,10 +74,11 @@ class Chapter(CommonInfo):
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "3. Chapter"
+        unique_together = ['title', 'subject']
 
     def __str__(self):
         """Return slug and first 8 char"""
-        return name_defination(self.title, self.subject.title)
+        return name_definition(self.title, self.subject)
 
 
 class Topic(CommonInfo):
@@ -86,12 +90,13 @@ class Topic(CommonInfo):
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "4. Concept"
+        unique_together = ['title', 'chapter']
 
     def __str__(self):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.title, self.chapter.title)
+        return name_definition(self.title, self.chapter)
 
 
 class ModuleData(CommonInfo):
@@ -103,12 +108,13 @@ class ModuleData(CommonInfo):
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "5. Module(s) Data"
+        unique_together = ['title', 'topic']
 
     def __str__(self):
         """
         Return slug and first 8 char
         """
-        return name_defination(self.title, self.topic.title)
+        return name_definition(self.title, self.topic)
 
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
@@ -116,11 +122,13 @@ for sender in [Course, Subject, Chapter, Topic, ModuleData]:
     Calls pre-save function to create the slug field
     """
     pre_save.connect(pre_save_create_slug, sender=sender)
+    pre_save.connect(global_signal.update_permission_if_obj_update, sender=sender)
     pre_delete.connect(delete_object_permission, sender=sender)
 
 
 # Connect global_signals with models here ...
 pre_save.connect(global_signal.change_log_msg, sender=LogEntry)
+pre_save.connect(create_topic, sender=Topic)
 
 post_save.connect(create_course, sender=Course)
 post_save.connect(create_subject, sender=Subject)
@@ -132,4 +140,5 @@ pre_save.connect(global_signal.change_user_type, sender=MyUser)
 
 # User permissions edit
 m2m_changed.connect(global_signal.update_user, sender=User.user_permissions.through)
+# m2m_changed.connect(global_signal.update_user_group, sender=User.groups.through)
 post_save.connect(global_signal.send_mail_on_user_create, sender=User)

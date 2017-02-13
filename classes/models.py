@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from utils import  name_definition
 
 
 class BoardCategory(models.Model):
@@ -37,6 +38,6 @@ class ClassCategory(models.Model):
 
     def __str__(self):
         """Return course title and first 8 char"""
-        return self.title
+        return name_definition(self.title, self.board)
 
 # Create your models here.

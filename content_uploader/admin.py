@@ -59,7 +59,7 @@ class MyUserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('username', 'email', 'employee_number', 'employee_designation', 'password1',
-                       'password2', 'department', 'type')}),
+                       'password2', 'department')}),
     )
 
     list_display = ('username', 'email', 'first_name', 'last_name', 'type')

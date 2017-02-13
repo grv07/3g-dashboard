@@ -35,7 +35,7 @@ def create_course(sender, instance,  **kwargs):
     print(obj_serializer.data)
     # TODO: Call api when module create
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
+                             per_codename=str(instance),
                              per_name=get_permission_name(instance))
 
 
@@ -53,7 +53,7 @@ def create_subject(sender, instance, **kwargs):
     obj_serializer = SubjectSerializer(instance)
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
+                             per_codename=str(instance),
                              per_name=get_permission_name(instance))
 
 
@@ -71,7 +71,7 @@ def create_chapter(sender, instance, **kwargs):
     obj_serializer = ChapterSerializer(instance)
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
+                             per_codename=str(instance),
                              per_name=get_permission_name(instance))
 
 
@@ -89,7 +89,7 @@ def create_topic(sender, instance, **kwargs):
     obj_serializer = TopicSerializer(instance)
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
+                             per_codename=str(instance),
                              per_name=get_permission_name(instance))
 
 
@@ -107,7 +107,7 @@ def create_module(sender, instance, **kwargs):
     obj_serializer = ModuleDataSerializer(instance)
     print(obj_serializer.data)
     create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.title,
+                             per_codename=str(instance),
                              per_name=get_permission_name(instance))
 
 
@@ -131,7 +131,10 @@ def delete_object_permission(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    permission = Permission.objects.get(
-        codename=instance.slug.lower(),
-        name=get_permission_name(instance).lower())
-    permission.delete()
+    try:
+        permission = Permission.objects.get(
+            codename=str(instance).lower(),
+            name=get_permission_name(instance).lower())
+        permission.delete()
+    except Exception as e:
+        print(e.args)

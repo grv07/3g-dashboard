@@ -15,8 +15,12 @@ def custom(self):
 Permission.__str__ = custom
 
 
+def name_definition(title, parent):
+    return (str(parent)+" | "+title).lower()
+
+
 def get_permission_name(instance):
-    return 'crud | '+instance.title+' :'+str(instance.code)[:18]
+    return 'crud | '+str(instance).lower()
 
 # from g3_dashboard import  settings
 
@@ -73,7 +77,7 @@ def create_object_permission(app_label, model_name, per_codename, per_name):
     Create permission on every object creations ...
     """
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
-    permission, is_new = Permission.objects.get_or_create(
+    permission = Permission.objects.get_or_create(
         codename=per_codename.lower(),
         name=per_name.lower(),
         content_type=content_type

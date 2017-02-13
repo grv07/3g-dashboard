@@ -17,7 +17,7 @@ class MyUser(AbstractUser):
                                                                       " 300 characters for employee number.")
     type = models.CharField(choices=[('DEFAULT', 'default',), ('STUDENT', 'student',), ('TEACHER', 'teacher',),
                                      ('UPLOADER', 'uploader'), ('ADMIN', 'admin',),
-                                     ('SUPER-ADMIN', 'super-admin')], max_length=20, default='DEFAULT')
+                                     ('SUPER-ADMIN', 'super-admin')], max_length=20, default='DEFAULT', editable=False)
     # REQUIRED_FIELDS = ['owner']
 
     class Meta:
