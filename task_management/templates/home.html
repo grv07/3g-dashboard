@@ -10,7 +10,7 @@
 <body>
     <nav>
         <div class="nav-wrapper">
-            <a class="brand-logo" href="">GENIUS</a>
+            <a class="brand-logo" href="{% url 'task_management:dashboard' %}">GENIUS</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a>{{ user }}</a></li>
                 <li><a href="{% url 'task_management:logout' %}">Logout</a></li>
