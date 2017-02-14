@@ -90,7 +90,8 @@ def assign_task(request):
         # form = TaskAssignForm()
 
     uploader_list = Uploader.objects.filter(user__owner=request.user.id)
-    return render(request, 'assign_task.html', {'form': form, 'uploaders': uploader_list})
+    perms = permissions(request.user.id)
+    return render(request, 'assign_task.html', {'form': form, 'uploaders': uploader_list, 'permissions': perms})
 
 
 def permissions(user_id):
@@ -99,7 +100,11 @@ def permissions(user_id):
     :param user_id:
     :return:
     """
-    perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
+    perms = {}
+    board_perms = Permission.objects.filter(content_type_id__model='boardcategory', user=user_id, )
+    course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
+
+    return perms
 
 
 def edit_task(request, task_id):
@@ -110,7 +115,16 @@ def edit_task(request, task_id):
     :return:
     """
     task = get_object_or_404(Task, pk=task_id)
-    return render(request, 'detail.html', {'task': task})
+    form = TaskAssignForm(request.POST or None, instance=task)
+    if form.is_valid():
+        task = form.save(commit=False)
+        task.status = 'ASSIGN'
+        task.assign_to_id = request.POST.get('assign_to')
+        task.assigned_by_id = request.user.id
+        form.save()
+        return redirect('task_management:dashboard')
+    uploader_list = Uploader.objects.filter(user__owner=request.user.id)
+    return render(request, 'assign_task.html', {'form': form, 'uploaders': uploader_list})
 
 
 def delete_task(request, task_id):

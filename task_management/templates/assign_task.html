@@ -18,19 +18,56 @@
     <div class="row">
         <form class="col s8" method="post" action="{% url 'task_management:assign_task' %}">
             {% csrf_token %}
+            <div class="row">
+                <label>Select Board</label>
+                <select name="board" id="board">
+                    <option value="CBSE">CBSE</option>
+                    <option value="ICSC">ICSC</option>
+                </select>
+                <label>Select Grade</label>
+                <select name="grade" id="grade">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+                <label>Select Stream</label>
+                <select name="stream" id="stream">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+                <label>Select Subject</label>
+                <select name="subject" id="subject">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+                <label>Select Chapter</label>
+                <select name="chapter" id="chapter">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+                <label>Select Concept</label>        
+                <select name="concept" id="concept">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+                <label>Select Module</label>
+                <select name="module" id="module">
+                    <option value="science">Science</option>
+                    <option value="maths">Maths</option>
+                </select>
+            </div>
 
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
                 <div class="input-field col s6">
 
-                    <input id="title" type="text" data-length="50" name="title" maxlength="50">
+                    <input id="title" type="text" data-length="50" name="title" maxlength="50" value="{{ form.title.value }}">
                     <label for="title">Title</label>
                 </div>
             </div>
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
                 <div class="input-field col s12">
-                    <input id="description" type="text" class="validate" name="description">
+                    <input id="description" type="text" class="validate" name="description" value="{{ form.description.value }}">
                     <label for="description">Task Description</label>
                 </div>
             </div>
@@ -47,7 +84,7 @@
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
                 <label>Select due date</label>
-                <input type="date" class="datepicker" name="due_date">
+                <input type="date" class="datepicker" name="due_date" value="{{ form.due_date.value }}">
             </div>
 
             <div class='row'>
