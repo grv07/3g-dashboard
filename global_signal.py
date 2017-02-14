@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from utils import send_mail, get_permission_name, add_permission_to_user_from_group
+from utils import send_mail, get_permission_name
 from constants import mail_template_constants
 
 
