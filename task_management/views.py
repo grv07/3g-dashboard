@@ -102,7 +102,7 @@ def permissions(user_id):
     """
     perms = {}
     board_perms = Permission.objects.filter(content_type_id__model='boardcategory', user=user_id, )
-    course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
+    # course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
 
     return perms
 
