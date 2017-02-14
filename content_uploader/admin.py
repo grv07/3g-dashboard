@@ -88,7 +88,7 @@ class MyUserAdmin(UserAdmin):
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()
                 form.base_fields['is_superuser'].widget = widgets.HiddenInput()
-
+                # self.readonly_fields = ('groups',)
                 permissions_id = []
                 for group in request.user.groups.all():
                     for permission in group.permissions.all():
@@ -101,7 +101,6 @@ class MyUserAdmin(UserAdmin):
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()
                 form.base_fields['is_superuser'].widget = widgets.HiddenInput()
                 permissions.queryset = permissions.queryset.filter(user=request.user)
-            self.readonly_fields = ('groups',)
         return form
     form = MyUserChangeForm
     add_form = MyUserCreationForm
