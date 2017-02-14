@@ -81,6 +81,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'g3_dashboard.wsgi.application'
 
 # AUTH_USER_MODEL = 'classes.UserProfile'

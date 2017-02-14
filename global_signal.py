@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from utils import send_mail, get_permission_name
+from utils import send_mail, get_permission_name, add_permission_to_user_from_group
 from constants import mail_template_constants
 
 
@@ -45,20 +45,21 @@ def update_permission_if_obj_update(sender, instance, **kwargs):
         print(e.args)
 
 
-def update_user_group(sender, instance, **kwargs):
-    print('-------- When assign group ------')
-    print(kwargs)
-    if type(instance).__name__ == 'Group':
-        print(instance.permissions.all())
-    elif type(instance).__name__ == 'MyUser' and kwargs.get('action') == 'post_add':
-        print(instance.groups.all())
-        for group in instance.groups.all():
-            # print(group)
-            for permission in group.permissions.all():
-                print(permission)
-                # print(instance.user_permissions.add(permission).query)
-                # TO-DO Call a raw sql query for add permissions to user
-                # otherwise create a call-hell via signals ..
+# def update_user_group(sender, instance, **kwargs):
+#     print('-------- When assign group ------')
+#     print(kwargs)
+#     if type(instance).__name__ == 'Group':
+#         print(instance.permissions.all())
+#     elif type(instance).__name__ == 'MyUser' and kwargs.get('action') == 'post_add':
+#         print(instance.groups.all())
+#         for group in instance.groups.all():
+#             # print(group)
+#             for permission in group.permissions.all():
+#                 print(permission.id, instance.id)
+#     # add_permission_to_user_from_group(5, 90)
+#                 # print(instance.user_permissions.add(permission).query)
+#                 # TO-DO Call a raw sql query for add permissions to user
+#                 # otherwise create a call-hell via signals ..
 
 
 def change_user_type(sender, instance, **kwargs):

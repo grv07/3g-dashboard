@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Uploader
 from django.db.models import Q
+from django.contrib.auth.models import PermissionsMixin
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
@@ -83,6 +84,19 @@ class MyUserAdmin(UserAdmin):
             permissions = form.base_fields['user_permissions']
             if request.user.is_superuser:
                 permissions.queryset = permissions.queryset.all()
+            elif request.user.is_staff:
+                form.base_fields['is_active'].widget = widgets.HiddenInput()
+                form.base_fields['is_staff'].widget = widgets.HiddenInput()
+                form.base_fields['is_superuser'].widget = widgets.HiddenInput()
+                form.base_fields['groups'].widget = widgets.HiddenInput()
+
+                permissions_id = []
+                for group in request.user.groups.all():
+                    for permission in group.permissions.all():
+                        permissions_id.append(permission.id)
+                permissions.queryset = permissions.queryset.filter(
+                    pk__in=permissions_id
+                )
             else:
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()

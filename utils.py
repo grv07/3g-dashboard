@@ -102,3 +102,4 @@ def create_slug(sender, instance, new_slug=None):
         new_slug = '%s-%s' %(slug, qs.count())
         return create_slug(sender, instance, new_slug=new_slug)
     return slug
+
