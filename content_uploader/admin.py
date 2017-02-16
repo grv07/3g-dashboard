@@ -1,7 +1,5 @@
-from django.contrib import admin
 from .models import Uploader
 from django.db.models import Q
-from django.contrib.auth.models import PermissionsMixin
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
@@ -72,7 +70,8 @@ class MyUserAdmin(UserAdmin):
         if user is super-admin:
             can see or select from all permissions avail.
         elif user is admin:
-            can select or allow his own restricted permissions to any other user.
+            can select or allow his own permissions to any other user only.
+
         :param request:
         :param obj:
         :param kwargs:
@@ -88,7 +87,7 @@ class MyUserAdmin(UserAdmin):
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()
                 form.base_fields['is_superuser'].widget = widgets.HiddenInput()
-                # self.readonly_fields = ('groups',)
+
                 permissions_id = []
                 for group in request.user.groups.all():
                     for permission in group.permissions.all():

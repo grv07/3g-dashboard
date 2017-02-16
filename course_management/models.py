@@ -20,9 +20,9 @@ class CommonInfo(models.Model):
     """
     Abstract class for reduce size of lines .. ;)
     """
-    title = models.CharField(max_length=100)
-    slug = models.SlugField(editable=False)
-    description = models.TextField(max_length=500)
+    title = models.TextField(max_length=100)
+    slug = models.SlugField(editable=False, max_length=110)
+    description = models.TextField(max_length=1500)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -89,6 +89,7 @@ class Topic(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
+        verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
 
