@@ -89,6 +89,7 @@ class Topic(CommonInfo):
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
+        verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
 
