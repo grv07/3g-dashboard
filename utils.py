@@ -1,8 +1,26 @@
 import smtplib
+from django.utils import six
 from email.mime.text import MIMEText
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.utils.text import slugify
+
+
+def custom(self):
+    return "%s | %s" % (
+        # six.text_type(self.content_type.app_label),
+        six.text_type(self.content_type),
+        six.text_type(self.name))
+
+Permission.__str__ = custom
+
+
+def name_definition(title, parent):
+    return (str(parent)+" | "+title).lower()
+
+
+def get_permission_name(instance):
+    return 'crud | '+str(instance).lower()
 
 # from g3_dashboard import  settings
 
@@ -59,8 +77,12 @@ def create_object_permission(app_label, model_name, per_codename, per_name):
     Create permission on every object creations ...
     """
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
-    permission, is_new = Permission.objects.get_or_create(codename=per_codename.lower(),
-                                           name=per_name.lower(), content_type=content_type)
+    permission = Permission.objects.get_or_create(
+        codename=per_codename.lower(),
+        name=per_name.lower(),
+        content_type=content_type
+        )
+
     return permission
 
 
@@ -76,7 +98,6 @@ def create_slug(sender, instance, new_slug=None):
     if new_slug is not None:
         slug = new_slug
     qs = sender.objects.filter(slug=slug).order_by('-id')
-    print(slug, '###########')
     if qs.exists():
         new_slug = '%s-%s' %(slug, qs.count())
         return create_slug(sender, instance, new_slug=new_slug)
