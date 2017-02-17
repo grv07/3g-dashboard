@@ -6,8 +6,7 @@ from django.db.models import Q
 
 from .forms import UserLoginForm, TaskAssignForm
 from .models import Task
-from content_uploader.models import Uploader
-from classes.models import MyUser
+from content_uploader.models import Uploader, MyUser
 
 
 def login_user(request):
@@ -45,15 +44,10 @@ def logout_user(request):
     return redirect('task_management:login')
 
 
-def uploader_dashboard(request):
-    """
-    Dashboard for the uploader.
-    :param request:
-    :return:
-    """
-    uploader = Uploader.objects.filter(user_id=request.user.id).values_list('id', flat=True).get()
-    tasks = Task.objects.filter(assign_to_id=uploader)
-    return render(request, 'dashboard.html', {'tasks': tasks})
+def get_uploaders(request):
+    admin_id = request.user.id
+    uploader_list = MyUser.objects.filter(owner=admin_id)
+    return render(request, 'select_uploader.html', {'uploader_list': uploader_list})
 
 
 def dashboard(request):
@@ -70,10 +64,11 @@ def dashboard(request):
         return render(request, 'dashboard.html', {'tasks': tasks})
 
 
-def assign_task(request):
+def assign_task(request, uploader_id):
     """
     To assign task to the uploader by the admin.
     :param request:
+    :param uploader_id:
     :return:
     """
     form = TaskAssignForm(request.POST or None)
@@ -81,7 +76,7 @@ def assign_task(request):
     if form.is_valid():
         task = form.save(commit=False)
         task.status = 'ASSIGN'
-        task.assign_to_id = request.POST.get('assign_to')
+        task.assign_to_id = uploader_id
         task.assigned_by_id = request.user.id
         task.save()
         return redirect('task_management:dashboard')
@@ -89,9 +84,8 @@ def assign_task(request):
         print(form)
         # form = TaskAssignForm()
 
-    uploader_list = Uploader.objects.filter(user__owner=request.user.id)
-    perms = permissions(request.user.id)
-    return render(request, 'assign_task.html', {'form': form, 'uploaders': uploader_list, 'permissions': perms})
+    perms = permissions(uploader_id)
+    return render(request, 'assign_task.html', {'form': form, 'permissions': perms})
 
 
 def permissions(user_id):
@@ -100,10 +94,14 @@ def permissions(user_id):
     :param user_id:
     :return:
     """
-    perms = {}
-    board_perms = Permission.objects.filter(content_type_id__model='boardcategory', user=user_id, )
-    # course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
-
+    # board_perms = Permission.objects.filter(content_type_id__model='boardcategory', user=user_id, )
+    course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
+    subject_perms = Permission.objects.filter(content_type_id__model='subject', user=user_id, name__contains='crud')
+    chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=user_id, name__contains='crud')
+    topic_perms = Permission.objects.filter(content_type_id__model='topic', user=user_id, name__contains='crud')
+    perms = {'course_permissions': course_perms, 'subject_perms': subject_perms, 'chapter_perms': chapter_perms,
+             'topic_perms': topic_perms}
+    print(perms)
     return perms
 
 

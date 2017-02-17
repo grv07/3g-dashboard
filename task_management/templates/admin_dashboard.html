@@ -1,6 +1,6 @@
 {% extends 'home.html' %}
 {% block body%}
-    <a class="waves-effect waves-light btn-large" href="{% url 'task_management:assign_task' %}">Assign new Task</a>
+    <a class="waves-effect waves-light btn-large" href="{% url 'task_management:select_uploader' %}">Assign new Task</a>
     {% if tasks %}
         {% for task in tasks %}
             <div class="row">

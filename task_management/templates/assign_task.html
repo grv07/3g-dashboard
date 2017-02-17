@@ -14,46 +14,42 @@
 {% block body%}
 <div class="container">
     <h1>Assign Task</h1>
-    {% if uploaders %}
     <div class="row">
-        <form class="col s8" method="post" action="{% url 'task_management:assign_task' %}">
+        <form class="col s8" method="post" action="">
             {% csrf_token %}
             <div class="row">
-                <label>Select Board</label>
-                <select name="board" id="board">
-                    <option value="CBSE">CBSE</option>
-                    <option value="ICSC">ICSC</option>
-                </select>
-                <label>Select Grade</label>
-                <select name="grade" id="grade">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
-                <label>Select Stream</label>
-                <select name="stream" id="stream">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
-                <label>Select Subject</label>
-                <select name="subject" id="subject">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
-                <label>Select Chapter</label>
-                <select name="chapter" id="chapter">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
-                <label>Select Concept</label>        
-                <select name="concept" id="concept">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
-                <label>Select Module</label>
-                <select name="module" id="module">
-                    <option value="science">Science</option>
-                    <option value="maths">Maths</option>
-                </select>
+                <div>
+                    <label>Select Course</label>
+                    <select name="course" id="course">
+                        {% for course in course_permissions %}
+                        <option value="{{ course.id }}">{{ course.codename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Select Subject</label>
+                    <select name="subject" id="subject">
+                        {% for subject in subject_permissions %}
+                        <option value="{{ subject.id }}">{{ subject.codename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Select Chapter</label>
+                    <select name="chapter" id="chapter">
+                        {% for chapter in chapter_permissions %}
+                        <option value="{{ chapter.id }}">{{ chapter.codename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Select Topic</label>
+                    <select name="topic" id="topic">
+                        {% for topic in topic_permissions %}
+                        <option value="{{ topic.id }}">{{ topic.codename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
             <div class="row">
@@ -74,15 +70,6 @@
 
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
-                <label>Select the uploader</label>
-                <select name="assign_to" id="assign_to">
-                    {% for uploader in uploaders %}
-                        <option value="{{ uploader.id }}">{{ uploader.user.username }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="row">
-                <span style="color: red">{{ form.errors.title }}</span>
                 <label>Select due date</label>
                 <input type="date" class="datepicker" name="due_date" value="{{ form.due_date.value }}">
             </div>
@@ -92,12 +79,7 @@
               </div>
         </form>
     </div>
-    {% else %}
-
-    <h5>You don't have any uploaders; add uploaders !!!!</h5>
-
-    {% endif %}
-</div>
+    </div>
 {% endblock %}
 <script>
     $('.datepicker').pickadate({

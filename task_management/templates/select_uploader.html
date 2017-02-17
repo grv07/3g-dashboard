@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends 'home.html' %}
+{% block extend_head %}
 
-</body>
-</html>
+{% endblock %}
+
+{% block body%}
+<div class="container">
+    <h4>Select the uploader to assign task</h4>
+    {% if uploader_list %}
+        {% for uploader in uploader_list %}
+            <a class="waves-effect waves-light btn" href="{% url 'task_management:assign_task' uploader.id %}">{{ uploader.username }}</a>
+        {% endfor %}
+
+    {% else %}
+        <h4 style="color: red">You don't have any uploaders, please add uploaders to assign tasks.</h4>
+</div>
+
+{% endif %}
+
+
+{% endblock %}

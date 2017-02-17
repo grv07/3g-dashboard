@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
-from content_uploader.models import Uploader
-from classes.models import MyUser
+from content_uploader.models import Uploader, MyUser
+
 
 status_fields = [('ASSIGN', 'assign'), ('COMPLETE', 'complete')]
 
