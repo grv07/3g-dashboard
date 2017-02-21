@@ -27,7 +27,7 @@ class CommonInfo(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('created',)
+        ordering = ('title',)
 
 
 class Course(CommonInfo):
@@ -41,6 +41,7 @@ class Course(CommonInfo):
         verbose_name_plural = "1. Stream"
         verbose_name = "Stream"
         unique_together = ['title', 'class_category']
+        ordering = ('class_category__title', 'title',)
 
     def __str__(self):
         """Retrun slug and first 8 char"""
@@ -57,6 +58,7 @@ class Subject(CommonInfo):
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "2. Subject"
         unique_together = ['title', 'course']
+        ordering = ('-course__class_category__title', 'title',)
 
     def __str__(self):
         """
@@ -75,7 +77,7 @@ class Chapter(CommonInfo):
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "3. Chapter"
         unique_together = ['title', 'subject']
-
+        ordering = ('-subject__course__class_category__title', 'title',)
     def __str__(self):
         """Return slug and first 8 char"""
         return name_definition(self.title, self.subject)
@@ -92,6 +94,8 @@ class Topic(CommonInfo):
         verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
+        #ordering = ('chapter__title', 'title',)
+        ordering = ('-chapter__subject__course__class_category__title','title',)
 
     def __str__(self):
         """
