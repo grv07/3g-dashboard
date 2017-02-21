@@ -7,6 +7,7 @@ from django.db.models import Q
 from .forms import UserLoginForm, TaskAssignForm
 from .models import Task
 from content_uploader.models import Uploader, MyUser
+from course_management.models import ModuleData
 
 
 def login_user(request):
@@ -71,12 +72,13 @@ def assign_task(request, uploader_id):
     :param uploader_id:
     :return:
     """
+    print(request.POST)
+    print('module_permission:', request.POST.get('module_permission'))
     form = TaskAssignForm(request.POST or None)
-
     if form.is_valid():
         task = form.save(commit=False)
         task.status = 'ASSIGN'
-        task.assign_to_id = uploader_id
+        task.assign_to_id = Uploader.objects.values_list('id', flat=True).get(user_id=uploader_id)
         task.assigned_by_id = request.user.id
         task.save()
         return redirect('task_management:dashboard')
@@ -94,13 +96,13 @@ def permissions(user_id):
     :param user_id:
     :return:
     """
-    # board_perms = Permission.objects.filter(content_type_id__model='boardcategory', user=user_id, )
     course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
     subject_perms = Permission.objects.filter(content_type_id__model='subject', user=user_id, name__contains='crud')
     chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=user_id, name__contains='crud')
     topic_perms = Permission.objects.filter(content_type_id__model='topic', user=user_id, name__contains='crud')
-    perms = {'course_permissions': course_perms, 'subject_perms': subject_perms, 'chapter_perms': chapter_perms,
-             'topic_perms': topic_perms}
+    module_perms = Permission.objects.filter(content_type_id__model='moduledata', user=user_id, name__contains='crud')
+    perms = {'course_permissions': course_perms, 'subject_permissions': subject_perms,
+             'chapter_permissions': chapter_perms, 'topic_permissions': topic_perms, 'module_permissions': module_perms}
     print(perms)
     return perms
 

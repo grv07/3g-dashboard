@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib import admin
+from django.contrib.auth.models import Permission
 from django.forms import widgets
 from admin_custom.user_field import MyUserCreationForm, MyUserChangeForm
 from .models import MyUser
@@ -80,10 +81,12 @@ class MyUserAdmin(UserAdmin):
         # Get form from original UserAdmin.
         form = super(MyUserAdmin, self).get_form(request, obj, **kwargs)
         if 'user_permissions' in form.base_fields:
+            print('@@@@@@@@@@@@@@@@@@@@@@@@')
             permissions = form.base_fields['user_permissions']
             if request.user.is_superuser:
                 permissions.queryset = permissions.queryset.all()
             elif request.user.is_staff:
+                print('************ is admin ******************')
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()
                 form.base_fields['is_superuser'].widget = widgets.HiddenInput()
@@ -92,10 +95,12 @@ class MyUserAdmin(UserAdmin):
                 for group in request.user.groups.all():
                     for permission in group.permissions.all():
                         permissions_id.append(permission.id)
+                permissions_id += [perm.id for perm in Permission.objects.filter(user=request.user)]
                 permissions.queryset = permissions.queryset.filter(
                     pk__in=permissions_id
                 )
             else:
+                print('###############')
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
                 form.base_fields['is_staff'].widget = widgets.HiddenInput()
                 form.base_fields['is_superuser'].widget = widgets.HiddenInput()

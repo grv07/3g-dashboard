@@ -2,8 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 from content_uploader.models import Uploader, MyUser
+from course_management.models import ModuleData
 
 
+default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 status_fields = [('ASSIGN', 'assign'), ('COMPLETE', 'complete')]
 
 
@@ -19,6 +21,7 @@ class Task(models.Model):
     assigned_by = models.ForeignKey(MyUser, default=11, blank=False)
     assigned_on = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField(default=timezone.now, blank=True)
+    module_permission = models.ForeignKey(ModuleData, blank=True)
 
     def __str__(self):
         return self.title
