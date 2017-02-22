@@ -2,29 +2,91 @@
 {% block extend_head %}
 <script>
         
-        var course_permission = {
-            "46": [{"id":"50","subject_name":"Subject1",
-                        "chapter":[{"id": "80", "chapter_name": "chapter1" , 
-                        "topic": [{"id": "90", "topic_name": "topic1",
-                        "module": [{"id": "100", "module_name": "module1"}]}]}]},
-                    {"id":"51","subject_name":"DEF"}],
-            "47": [{"id":"60","subject_name":"PQR"},{"id":"61","subject_name":"xyz"}]
-            };
+        var course_permission = [{'id': "46", "course": "course1",
+            "subjects": [{"id": "47", "subject_name": "subject1",
+                        "chapter": [{"id": "48", "chapter_name": "chapter1",
+                        "topic": [{"id": "49", "topic_name": "topic1",
+                        "module": [{"id": "100", "module_name": "module1"}]}]}]}]},
+            {"id": "50", "course": "course2",
+                        "subjects": [{"id": "51", "subject_name": "subject2",
+                        "chapter": [{"id": "52", "chapter_name": "chapter2",
+                        "topic": [{"id": "53", "topic_name": "topic2",
+                        "module": [{"id": "54", "module_name": "module2",}]}]}]}]}]
         
         var filtered_permissions;
 
         function filterSubjects(courseChoice){
             var data_id = courseChoice.value;
             var permission_name = courseChoice.id;
-            filtered_permissions = course_permission[data_id];
+            for(i in course_permission){
+                if(course_permission[i].id == data_id){
+                    filtered_permissions = course_permission[i].subjects;
+                }
+            }
             console.log(filtered_permissions);
-            console.log(courseChoice.value);
+
+            var subjects = "<option value="+data_id+">"+courseChoice.id+"</option>";
+            $('#subject_permission').append(subjects);
+
+            $(document).ready(function() {
+            $('select').material_select();
+        });
         }
 
         function filterChapters(subjectChoice){
             var data_id = subjectChoice.value;
-            filtered_permissions = filtered_permissions[data_id]
+            console.log(data_id);
+            console.log(filtered_permissions);
+            for(var i=0; i < filtered_permissions.length; i++){
+                if(filtered_permissions[i]["id"] === data_id){
+                    filtered_permissions = filtered_permissions[i].chapter;
+                    console.log(filtered_permissions);
+                }
+            }
+            var subjects = "<option value="+data_id+">"+subjectChoice.id+"</option>";
+            $('#chapter_permission').append(subjects);
+            $(document).ready(function() {
+            $('select').material_select();
+        });
         }
+
+        function filterTopics(chapterChoice){
+            var data_id = chapterChoice.value;
+            console.log(data_id);
+            for(var i=0; i < filtered_permissions.length; i++){
+                if(filtered_permissions[i]["id"] === data_id){
+                    filtered_permissions = filtered_permissions[i].topic;
+                    console.log(filtered_permissions);
+                }
+            }
+            var subjects = "<option value="+data_id+">"+chapterChoice.id+"</option>";
+            $('#topic_permission').append(subjects);
+
+            $(document).ready(function() {
+            $('select').material_select();
+        });
+        }
+
+        function filterModules(topicChoice){
+            $('#'+data_id).click(function(){
+
+            });
+            var data_id = topicChoice.value;
+            console.log(data_id);
+            for(var i=0; i < filtered_permissions.length; i++){
+                if(filtered_permissions[i]["id"] === data_id){
+                    filtered_permissions = filtered_permissions[i].module;
+                    console.log(filtered_permissions);
+                }
+            }
+            var subjects = "<option value="+data_id+">"+topicChoice.id+"</option>";
+            $('#module_permission').append(subjects);
+
+            $(document).ready(function() {
+            $('select').material_select();
+        });
+        }
+
         
         $(document).ready(function() {
             $('select').material_select();
@@ -34,10 +96,10 @@
             selectMonths: true,
             selectYears: 15
         });
-
-         $('#add_choice').click(function(){
-             var choice = "<br/><div class='row' id='div "+counter+" '><div class='col-sm-4'>Choice: "+counter+" <input type='text' placeholder='Choice "+counter+"' name='choice' id='choice"+counter+"' /></div><div class='col-sm-8'><input type='file' name='get_image' id='imgInp"+ counter+"' onchange='readURL(this);' multiple/><br /><img id='blah"+counter+"' style='display:none' alt='your image' /></div></div>"
-             $('#form-test').append(choice)
+        
+        $('#add_choice').click(function(){
+            var choice = "<br/><div class='row' id='div "+counter+" '><div class='col-sm-4'>Choice: "+counter+" <input type='text' placeholder='Choice "+counter+"' name='choice' id='choice"+counter+"' /></div><div class='col-sm-8'><input type='file' name='get_image' id='imgInp"+ counter+"' onchange='readURL(this);' multiple/><br /><img id='blah"+counter+"' style='display:none' alt='your image' /></div></div>"
+            $('#form-test').append(choice)
             return true;
 
    });
@@ -46,7 +108,7 @@
 {% endblock %}
 
 {% block body%}
-<div class="container">
+<!--<div class="container">-->
     <h1>Assign Task</h1>
     <div class="row">
         <form class="col s8" method="post">
@@ -64,8 +126,8 @@
                 </div>
                 <div>
                     <label>Subject</label>
-                    <select name="subject_permission" id="subject_permission">
-                        <option value="" disabled selected>Select Subject</option>
+                    <select name="subject_permission" id="subject_permission" onchange="filterChapters(this)">
+                        <option value="">Select Subject</option>
                         {% for subject in permissions.subject_permissions %}
                         <option value="{{ subject.id }}">{{ subject.codename }}</option>
                         {% endfor %}
@@ -73,8 +135,8 @@
                 </div>
                 <div>
                     <label>Chapter</label>
-                    <select name="chapter_permission" id="chapter_permission">
-                        <option value="" disabled selected>Select Chapter</option>
+                    <select name="chapter_permission" id="chapter_permission" onchange="filterTopics(this)">
+                        <option value="">Select Chapter</option>
                         {% for chapter in permissions.chapter_permissions %}
                         <option value="{{ chapter.id }}">{{ chapter.codename }}</option>
                         {% endfor %}
@@ -82,7 +144,7 @@
                 </div>
                 <div>
                     <label>Topic</label>
-                    <select name="topic_permission" id="topic_permission" multiple>
+                    <select name="topic_permission" id="topic_permission" onchange="filterModules(this)">
                         <option value="" disabled selected>Select Topic</option>
                         {% for topic in permissions.topic_permissions %}
                         <option value="{{ topic.id }}">{{ topic.codename }}</option>
@@ -94,7 +156,7 @@
                     <select name="module_permission" id="module_permission" multiple>
                         <option value="" disabled selected>Select module</option>
                         {% for module in permissions.module_permissions %}
-                        <option value="{{ module.id }}">{{ module.codename }}</option>
+                        <option value="{{ module.code }}">{{ module.codename }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -127,5 +189,5 @@
               </div>
         </form>
     </div>
-    </div>
+    <!--</div>-->
 {% endblock %}
