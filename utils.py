@@ -5,6 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.utils.text import slugify
 
+import inspect
+
 
 def custom(self):
     return "%s | %s" % (
@@ -103,3 +105,20 @@ def create_slug(sender, instance, new_slug=None):
         return create_slug(sender, instance, new_slug=new_slug)
     return slug
 
+
+def add_current_objects_parent_to_request_session(sender, instance, **kwargs):
+    """
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return: Save objects code on pre_save
+             class data for get its parent's code when initialize form drop down.
+    """
+    for frame_record in inspect.stack():
+        if frame_record[3] == 'get_response':
+            request = frame_record[0].f_locals['request']
+            break
+    else:
+        request = None
+    if request:
+        request.session['LS:'+sender.__name__] = str(instance.code)

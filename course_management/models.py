@@ -8,7 +8,7 @@ from .signals import *
 from django.contrib.admin.models import LogEntry
 from content_uploader.models import MyUser
 
-from utils import name_definition
+from utils import (name_definition, add_current_objects_parent_to_request_session)
 
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
@@ -78,6 +78,7 @@ class Chapter(CommonInfo):
         verbose_name_plural = "3. Chapter"
         unique_together = ['title', 'subject']
         ordering = ('-subject__course__class_category__title', 'title',)
+
     def __str__(self):
         """Return slug and first 8 char"""
         return name_definition(self.title, self.subject)
@@ -94,7 +95,6 @@ class Topic(CommonInfo):
         verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
-        #ordering = ('chapter__title', 'title',)
         ordering = ('-chapter__subject__course__class_category__title','title',)
 
     def __str__(self):
@@ -108,7 +108,7 @@ class ModuleData(CommonInfo):
     """
     ModuleData class for CRUD
     """
-    topic = models.ForeignKey('Topic', default=default_uuid)
+    topic = models.ForeignKey('Topic', default=default_uuid, related_name='parent')
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
@@ -127,6 +127,8 @@ for sender in [Course, Subject, Chapter, Topic, ModuleData]:
     Calls pre-save function to create the slug field
     """
     pre_save.connect(pre_save_create_slug, sender=sender)
+    pre_save.connect(add_current_objects_parent_to_request_session, sender=sender)
+
     pre_save.connect(global_signal.update_permission_if_obj_update, sender=sender)
     pre_delete.connect(delete_object_permission, sender=sender)
 
