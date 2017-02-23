@@ -80,7 +80,7 @@ def assign_task(request, uploader_id):
         task.status = 'ASSIGN'
         task.assign_to_id = Uploader.objects.values_list('id', flat=True).get(user_id=uploader_id)
         task.assigned_by_id = request.user.id
-        task.module_permission = ModuleData.objects.get(code=request.POST.get('module_permission'))
+        # task.module_permission = ModuleData.objects.get(code=request.POST.get('module_permission'))
         task.save()
         return redirect('task_management:dashboard')
     else:
