@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.http import Http404
@@ -7,7 +7,7 @@ from django.db.models import Q
 from .forms import UserLoginForm, TaskAssignForm
 from .models import Task
 from content_uploader.models import Uploader, MyUser
-from course_management.models import ModuleData
+from course_management.models import Course, Subject, Chapter, Topic, ModuleData
 
 
 def login_user(request):
@@ -87,29 +87,46 @@ def assign_task(request, uploader_id):
         print(form)
         # form = TaskAssignForm()
 
-    perms = permissions(uploader_id)
-    return render(request, 'assign_task.html', {'form': form, 'permissions': perms})
+    course_data = []
+    course_perms = Permission.objects.filter(content_type_id__model='course', user=uploader_id, name__contains='crud')
+    for course in course_perms:
+        course_name = course.name.split('| ')[-1]
+        course_data.append(Course.objects.get(title__icontains=course_name))
+
+    uploader_data = MyUser.objects.get(id=uploader_id)
+    return render(request, 'assign_task.html', {'form': form, 'course_permissions': course_data, 'uploader': uploader_data})
 
 
-def permissions(user_id):
+def permissions(uploader_id):
     """
     Get the permissions allotted to the user.
-    :param user_id:
+    :param uploader_id:
     :return:
     """
+    subject_data = []
+    chapter_data = []
+    topic_data = []
     module_data = []
-    course_perms = Permission.objects.filter(content_type_id__model='course', user=user_id, name__contains='crud')
-    subject_perms = Permission.objects.filter(content_type_id__model='subject', user=user_id, name__contains='crud')
-    chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=user_id, name__contains='crud')
-    topic_perms = Permission.objects.filter(content_type_id__model='topic', user=user_id, name__contains='crud')
-    module_perms = Permission.objects.filter(content_type_id__model='moduledata', user=user_id, name__contains='crud')
-    for module in module_perms:
-        module_data.append({ModuleData.objects.get()})
 
-    print(module_perms)
-    perms = {'course_permissions': course_perms, 'subject_permissions': subject_perms,
-             'chapter_permissions': chapter_perms, 'topic_permissions': topic_perms, 'module_permissions': module_perms}
-    # print(perms)
+    subject_perms = Permission.objects.filter(content_type_id__model='subject', user=uploader_id, name__contains='crud')
+    for subject in subject_perms:
+        subject_name = subject.name.split('| ')[-1]
+        subject_data.append(Subject.objects.get(title__icontains=subject_name))
+    chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=uploader_id, name__contains='crud')
+    for chapter in chapter_perms:
+        chapter_name = chapter.name.split('| ')[-1]
+        chapter_data.append(Chapter.objects.get(title__icontains=chapter_name))
+    topic_perms = Permission.objects.filter(content_type_id__model='topic', user=uploader_id, name__contains='crud')
+    for topic in topic_perms:
+        topic_name = topic.name.split('| ')[-1]
+        topic_data.append(Topic.objects.get(title__icontains=topic_name))
+    module_perms = Permission.objects.filter(content_type_id__model='moduledata', user=uploader_id, name__contains='crud')
+    for module in module_perms:
+        module_name = module.name.split('| ')[-1]
+        module_data.append(ModuleData.objects.get(title__icontains=module_name))
+    perms = {'subject_permissions': subject_perms,'chapter_permissions': chapter_perms,
+             'topic_permissions': topic_perms, 'module_permissions': module_perms}
+    print(perms)
     return perms
 
 
@@ -146,3 +163,13 @@ def delete_task(request, task_id):
         return redirect('task_management:dashboard')
     else:
         raise Http404
+
+
+def test_ajax(request):
+    """
+    To test the ajax call.
+    :param request:
+    :return:
+    """
+    if request.is_ajax():
+        return HttpResponse('<p>Hello Bitches !!!!</p>')

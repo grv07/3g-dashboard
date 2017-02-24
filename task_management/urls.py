@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^select_uploader$', views.get_uploaders, name='select_uploader'),
     url(r'^(?P<task_id>[0-9]+)/edit$', views.edit_task, name='edit_task'),
     url(r'^(?P<uploader_id>[0-9]+)/assign_task$', views.assign_task, name='assign_task'),
-    url(r'^(?P<task_id>[0-9]+)/delete/$', views.delete_task, name='delete_task')
+    url(r'^(?P<task_id>[0-9]+)/delete/$', views.delete_task, name='delete_task'),
+
+    url(r'^test_ajax/$', views.test_ajax)
 ]

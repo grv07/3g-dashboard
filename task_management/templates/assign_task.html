@@ -1,21 +1,18 @@
 {% extends 'home.html' %}
 {% block extend_head %}
 <script>
-        
-        var course_permission = [{'id': "46", "course": "course1",
-            "subjects": [{"id": "47", "subject_name": "subject1",
-                        "chapter": [{"id": "48", "chapter_name": "chapter1",
-                        "topic": [{"id": "49", "topic_name": "topic1",
-                        "module": [{"id": "100", "module_name": "module1"}]}]}]}]},
-            {"id": "50", "course": "course2",
-                        "subjects": [{"id": "51", "subject_name": "subject2",
-                        "chapter": [{"id": "52", "chapter_name": "chapter2",
-                        "topic": [{"id": "53", "topic_name": "topic2",
-                        "module": [{"id": "54", "module_name": "module2",}]}]}]}]}]
-        
+                
         var filtered_permissions;
 
         function filterSubjects(courseChoice){
+
+            $.ajax({
+                url: "tasks/test_ajax/",
+                method: "get",
+                dataType: 'json',
+                success: ,
+            });
+                
             var data_id = courseChoice.value;
             var permission_name = courseChoice.id;
             for(i in course_permission){
@@ -30,8 +27,13 @@
 
             $(document).ready(function() {
             $('select').material_select();
+
+            $.ajax({
+
+            })
+
         });
-        }
+        };
 
         function filterChapters(subjectChoice){
             var data_id = subjectChoice.value;
@@ -48,7 +50,7 @@
             $(document).ready(function() {
             $('select').material_select();
         });
-        }
+        };
 
         function filterTopics(chapterChoice){
             var data_id = chapterChoice.value;
@@ -65,7 +67,8 @@
             $(document).ready(function() {
             $('select').material_select();
         });
-        }
+        };
+
 
         function filterModules(topicChoice){
             $('#'+data_id).click(function(){
@@ -85,24 +88,26 @@
             $(document).ready(function() {
             $('select').material_select();
         });
-        }
+        };
 
         
         $(document).ready(function() {
             $('select').material_select();
         });
+
         
         $('.datepicker').pickadate({
             selectMonths: true,
             selectYears: 15
         });
+
         
         $('#add_choice').click(function(){
             var choice = "<br/><div class='row' id='div "+counter+" '><div class='col-sm-4'>Choice: "+counter+" <input type='text' placeholder='Choice "+counter+"' name='choice' id='choice"+counter+"' /></div><div class='col-sm-8'><input type='file' name='get_image' id='imgInp"+ counter+"' onchange='readURL(this);' multiple/><br /><img id='blah"+counter+"' style='display:none' alt='your image' /></div></div>"
             $('#form-test').append(choice)
             return true;
-
    });
+
 
     </script>
 {% endblock %}
@@ -119,8 +124,8 @@
                     <select name="course_permission" id="course_permission" onchange="filterSubjects(this)">
                     <!--<select name="course_permission" id="course_permission" onmousedown="this.value" onchange="test()">-->
                         <option value="" disabled selected>Select Course</option>
-                        {% for course in permissions.course_permissions %}
-                        <option value="{{ course.id }}">{{ course.codename }}</option>
+                        {% for course in course_permissions %}
+                            <option value="course.code">{{ course.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -160,6 +165,10 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
+
+            <div class="row">
+                <input id="uploader" type="text" value="{{ uploader.username }}" disabled >
             </div>
 
             <div class="row">

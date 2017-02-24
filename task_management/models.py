@@ -21,7 +21,7 @@ class Task(models.Model):
     assigned_by = models.ForeignKey(MyUser, default=11, blank=False)
     assigned_on = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField(default=timezone.now, blank=True)
-    course_permission = models.ForeignKey(Course, blank=True, default=default_uuid)
+    # course_permission = models.ForeignKey(Course, blank=True, default=default_uuid)
     # module_permission = models.ForeignKey(ModuleData, blank=True)
 
     def __str__(self):
