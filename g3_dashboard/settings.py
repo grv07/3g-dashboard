@@ -153,6 +153,7 @@ from django.contrib.auth.models import Permission
 
 ContentType._meta.get_field("app_label").max_length = 1000
 Permission._meta.get_field("codename").max_length = 1000
+Permission._meta.get_field("codename")._unique = True
 Permission._meta.get_field("name").max_length = 1000
 
 
