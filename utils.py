@@ -17,6 +17,10 @@ def custom(self):
 Permission.__str__ = custom
 
 
+def uuid_name_definition(parent, str_uuid):
+    return (parent.get_uuid_name_definition() + " | " + str_uuid).lower()
+
+
 def name_definition(title, parent):
     return (str(parent)+" | "+title).lower()
 

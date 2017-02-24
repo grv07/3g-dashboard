@@ -8,7 +8,7 @@ from .signals import *
 from django.contrib.admin.models import LogEntry
 from content_uploader.models import MyUser
 
-from utils import (name_definition, add_current_objects_parent_to_request_session)
+from utils import (name_definition, add_current_objects_parent_to_request_session, uuid_name_definition)
 
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
 # ---Global MSG---
@@ -47,6 +47,9 @@ class Course(CommonInfo):
         """Retrun slug and first 8 char"""
         return name_definition(self.title, self.class_category)
 
+    def get_uuid_name_definition(self):
+        return uuid_name_definition(self.class_category, str(self.code))
+
 
 class Subject(CommonInfo):
     """
@@ -66,6 +69,9 @@ class Subject(CommonInfo):
         """
         return name_definition(self.title, self.course)
 
+    def get_uuid_name_definition(self):
+        return uuid_name_definition(self.course, str(self.code))
+
 
 class Chapter(CommonInfo):
     """
@@ -83,6 +89,9 @@ class Chapter(CommonInfo):
         """Return slug and first 8 char"""
         return name_definition(self.title, self.subject)
 
+    def get_uuid_name_definition(self):
+        return uuid_name_definition(self.subject, str(self.code))
+
 
 class Topic(CommonInfo):
     """
@@ -95,13 +104,16 @@ class Topic(CommonInfo):
         verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
-        ordering = ('-chapter__subject__course__class_category__title','title',)
+        ordering = ('-chapter__subject__course__class_category__title', 'title',)
 
     def __str__(self):
         """
         Return slug and first 8 char
         """
         return name_definition(self.title, self.chapter)
+
+    def get_uuid_name_definition(self):
+        return uuid_name_definition(self.chapter, str(self.code))
 
 
 class ModuleData(CommonInfo):
@@ -120,6 +132,9 @@ class ModuleData(CommonInfo):
         Return slug and first 8 char
         """
         return name_definition(self.title, self.topic)
+
+    def get_uuid_name_definition(self):
+        return uuid_name_definition(self.topic, str(self.code))
 
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:

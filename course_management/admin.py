@@ -3,6 +3,7 @@ from .models import Course, Subject, Chapter, Topic, ModuleData
 
 admin.site.register(Course)
 
+
 def get_initial_return(request, _class, _parent_class):
     """
     :return: A dict to set initial value on form for drop-down.
