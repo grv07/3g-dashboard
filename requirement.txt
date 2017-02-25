@@ -1,10 +1,12 @@
 alabaster==0.7.9
 Babel==2.3.4
 Django==1.10.4
+django-annoying==0.10.3
 django-logentry-admin==1.0.2
 djangorestframework==3.5.3
 docutils==0.13.1
 imagesize==0.7.1
+invoke==0.14.0
 Jinja2==2.8.1
 MarkupSafe==0.23
 psycopg2==2.6.2
