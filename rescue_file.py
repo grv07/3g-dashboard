@@ -1,4 +1,4 @@
-
+from django.contrib.auth.models import Permission
 # //////////////////////////////////////////////////////////////
 # ////////////////// Not Regular Used Function /////////////////
 # //////////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@ def rescue_title_to_lower():
     from classes.models import BoardCategory, ClassCategory
 
     for cls in [BoardCategory, ClassCategory, Course, Subject, Chapter, Topic, ModuleData]:
-        for obj in cls:
+        for obj in cls.objects.all():
             obj.title = obj.title.lower()
             obj.save()
 
@@ -22,15 +22,24 @@ def rescue_codename_of_permission():
     # Save all title to lower in DB
     # rescue_title_to_lower()
 
+    def save_per_now(_perm, _instance):
+        _perm.uuid_codename = _instance.get_uuid_name_definition()
+        _perm.save()
+
     _count = 0
     error_list = set()
     perm_error_list = list()
+
     for perm in perm_list:
         name_string = perm.codename
+        if perm.id in [43, 44, 45, 47, 48, 49]:
+            perm_error_list.append(perm)
+            continue
         _branches = name_string.split(' | ')
         # static_branches = [BoardCategory, ClassCategory, Course, Subject, Chapter, Topic, ModuleData]
         topic = None
         len_branches = len(_branches)
+        print(_branches[0])
         bc = BoardCategory.objects.get(title=_branches[0])
         cc = ClassCategory.objects.get(title=_branches[1], board=bc)
         if len_branches >= 2+1:
@@ -66,6 +75,7 @@ def rescue_codename_of_permission():
                                 print('ModuleData .. ', _branches[6])
                                 mod = ModuleData.objects.get(title=_branches[6], topic=topic)
                                 print('=====', print_obj(mod))
+                                save_per_now(perm, mod)
                             except Exception as e:
                                 print(_branches[6])
                                 error_list.add(str(topic)+" | "+_branches[6])
@@ -73,23 +83,18 @@ def rescue_codename_of_permission():
                                 perm.save()
                         else:
                             _count += 1
-                            perm.uuid_codename = topic.get_uuid_name_definition()
-                            perm.save()
+                            save_per_now(perm, topic)
                     else:
-                        perm.uuid_codename = chap.get_uuid_name_definition()
-                        perm.save()
+                        save_per_now(perm, chap)
                         _count += 1
                 else:
-                    perm.uuid_codename = sub.get_uuid_name_definition()
-                    perm.save()
+                    save_per_now(perm, sub)
                     _count += 1
             else:
-                perm.uuid_codename = co.get_uuid_name_definition()
-                perm.save()
+                save_per_now(perm, co)
                 _count += 1
         else:
-            perm.uuid_codename = cc.get_uuid_name_definition()
-            perm.save()
+            save_per_now(perm, cc)
             _count += 1
     print(_count, len(perm_list))
     print(error_list, '----', 'effected-per: ---', perm_error_list)
