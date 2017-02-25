@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Course, Subject, Chapter, Topic, ModuleData
+from annoying.functions import get_object_or_None
 
 admin.site.register(Course)
 
@@ -11,20 +12,24 @@ def get_initial_return(request, _class, _parent_class):
     parent_key = request.session.get('LS:'+_class.__name__, False)
     if parent_key:
         if _parent_class == 'course':
+            _obj = get_object_or_None(_class, pk=parent_key)
             return {
-                'course': _class.objects.get(pk=parent_key).course.code,
+                'course': _obj.course.code if _obj else '',
             }
         elif _parent_class == 'subject':
+            _obj = get_object_or_None(_class, pk=parent_key)
             return {
-                'subject': _class.objects.get(pk=parent_key).subject.code,
+                'subject': _obj.subject.code if _obj else '',
             }
         elif _parent_class == 'chapter':
+            _obj = get_object_or_None(_class, pk=parent_key)
             return {
-                'chapter': _class.objects.get(pk=parent_key).chapter.code,
+                'chapter': _obj.chapter.code if _obj else '',
             }
         elif _parent_class == 'topic':
+            _obj = get_object_or_None(_class, pk=parent_key)
             return {
-                'topic': _class.objects.get(pk=parent_key).topic.code,
+                'topic': _obj.topic.code if _obj else '',
             }
         else:
             pass

@@ -24,7 +24,7 @@ class BoardCategory(models.Model):
         return str(self.code)
     
     def save(self, force_insert=False, force_update=False):
-        self.title = self.title.upper()
+        self.title = self.title.lower()
         super(BoardCategory, self).save(force_insert, force_update)
         
 
@@ -52,7 +52,7 @@ class ClassCategory(models.Model):
         return uuid_name_definition(self.board, str(self.code))
     
     def save(self, force_insert=False, force_update=False):
-        self.title = self.title.upper()
+        self.title = self.title.lower()
         super(ClassCategory, self).save(force_insert, force_update)
 
 # Create your models here.

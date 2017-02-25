@@ -126,6 +126,7 @@ class ModuleData(CommonInfo):
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "5. Module(s) Data"
         unique_together = ['title', 'topic']
+        ordering = ('-topic__chapter__subject__course__class_category__title', 'title',)
 
     def __str__(self):
         """
