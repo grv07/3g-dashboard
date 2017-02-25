@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.http import Http404
 from django.db.models import Q
 
+import json
+
 from .forms import UserLoginForm, TaskAssignForm
 from .models import Task
 from content_uploader.models import Uploader, MyUser
@@ -80,7 +82,7 @@ def assign_task(request, uploader_id):
         task.status = 'ASSIGN'
         task.assign_to_id = Uploader.objects.values_list('id', flat=True).get(user_id=uploader_id)
         task.assigned_by_id = request.user.id
-        # task.module_permission = ModuleData.objects.get(code=request.POST.get('module_permission'))
+        task.module_permission = ModuleData.objects.get(code=request.POST.get('module_permission'))
         task.save()
         return redirect('task_management:dashboard')
     else:
@@ -89,6 +91,7 @@ def assign_task(request, uploader_id):
 
     course_data = []
     course_perms = Permission.objects.filter(content_type_id__model='course', user=uploader_id, name__contains='crud')
+
     for course in course_perms:
         course_name = course.name.split('| ')[-1]
         course_data.append(Course.objects.get(title__icontains=course_name))
@@ -97,12 +100,15 @@ def assign_task(request, uploader_id):
     return render(request, 'assign_task.html', {'form': form, 'course_permissions': course_data, 'uploader': uploader_data})
 
 
-def permissions(uploader_id):
+def permissions(request, uploader_id):
     """
     Get the permissions allotted to the user.
-    :param uploader_id:
+    :param request:
     :return:
     """
+    print('request data:', request.GET)
+    # uploader_id = request.POST.get('uploader_id')
+    print(uploader_id)
     subject_data = []
     chapter_data = []
     topic_data = []
@@ -110,24 +116,24 @@ def permissions(uploader_id):
 
     subject_perms = Permission.objects.filter(content_type_id__model='subject', user=uploader_id, name__contains='crud')
     for subject in subject_perms:
-        subject_name = subject.name.split('| ')[-1]
-        subject_data.append(Subject.objects.get(title__icontains=subject_name))
+        subject_name = subject.name.split(' | ')[-1]
+        subject_data.append(Subject.objects.values('title', 'code').get(title__icontains=subject_name))
     chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=uploader_id, name__contains='crud')
     for chapter in chapter_perms:
         chapter_name = chapter.name.split('| ')[-1]
-        chapter_data.append(Chapter.objects.get(title__icontains=chapter_name))
+        chapter_data.append(Chapter.objects.values('title', 'code').get(title__icontains=chapter_name))
     topic_perms = Permission.objects.filter(content_type_id__model='topic', user=uploader_id, name__contains='crud')
     for topic in topic_perms:
         topic_name = topic.name.split('| ')[-1]
-        topic_data.append(Topic.objects.get(title__icontains=topic_name))
+        topic_data.append(Topic.objects.values('title', 'code').get(title__icontains=topic_name))
     module_perms = Permission.objects.filter(content_type_id__model='moduledata', user=uploader_id, name__contains='crud')
     for module in module_perms:
         module_name = module.name.split('| ')[-1]
-        module_data.append(ModuleData.objects.get(title__icontains=module_name))
-    perms = {'subject_permissions': subject_perms,'chapter_permissions': chapter_perms,
+        module_data.append(ModuleData.objects.values('title', 'code').get(title__icontains=module_name))
+    perms = {'subject_permissions': subject_perms, 'chapter_permissions': chapter_perms,
              'topic_permissions': topic_perms, 'module_permissions': module_perms}
     print(perms)
-    return perms
+    return json.dumps(perms)
 
 
 def edit_task(request, task_id):
@@ -164,12 +170,3 @@ def delete_task(request, task_id):
     else:
         raise Http404
 
-
-def test_ajax(request):
-    """
-    To test the ajax call.
-    :param request:
-    :return:
-    """
-    if request.is_ajax():
-        return HttpResponse('<p>Hello Bitches !!!!</p>')

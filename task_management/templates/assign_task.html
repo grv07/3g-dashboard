@@ -5,14 +5,23 @@
         var filtered_permissions;
 
         function filterSubjects(courseChoice){
-
+            var uploader_id = $('#uploader').val();
+            console.log(uploader_id)
+            
             $.ajax({
-                url: "tasks/test_ajax/",
+                url: "test_ajax",
                 method: "get",
                 dataType: 'json',
-                success: ,
-            });
+                data: {'uploader_id': uploader_id},
+                success: function(data){
+                    console.log(data)
+                    filtered_permissions = data
+                },
                 
+
+            });
+            
+            console.log(filtered_permissions);
             var data_id = courseChoice.value;
             var permission_name = courseChoice.id;
             for(i in course_permission){
@@ -168,7 +177,7 @@
             </div>
 
             <div class="row">
-                <input id="uploader" type="text" value="{{ uploader.username }}" disabled >
+                <input id="uploader" type="text" value="{{ uploader.id }}" disabled hidden>
             </div>
 
             <div class="row">
