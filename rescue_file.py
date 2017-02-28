@@ -76,7 +76,7 @@ def rescue_codename_of_permission():
                                 _count += 1
                                 print('ModuleData .. ', _branches[6])
                                 mod = ModuleData.objects.get(title=_branches[6], topic=topic)
-                                print('=====', print_obj(mod))
+                                # print('=====', print_obj(mod))
                                 save_per_now(perm, mod)
                             except Exception as e:
                                 print(_branches[6])
