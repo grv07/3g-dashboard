@@ -17,13 +17,15 @@ def rescue_title_to_lower():
 def rescue_codename_of_permission():
     from course_management.models import Course, Subject, Chapter, Topic, ModuleData
     from classes.models import BoardCategory, ClassCategory
+
     perm_list = Permission.objects.filter(name__contains='crud |')
-    print_obj = lambda obj: ''
+    # print_obj = lambda obj: ''
     # Save all title to lower in DB
     # rescue_title_to_lower()
 
     def save_per_now(_perm, _instance):
-        _perm.uuid_codename = _instance.get_uuid_name_definition()
+        # _perm.uuid_codename = str(_instance.str_code())
+        _perm.codename = _instance.get_uuid_name_definition()
         _perm.save()
 
     _count = 0

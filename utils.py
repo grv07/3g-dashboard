@@ -1,23 +1,18 @@
 import smtplib
-from django.utils import six
 from email.mime.text import MIMEText
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.utils.text import slugify
 
 import inspect
-
-
-def custom(self):
-    return "%s | %s" % (
-        # six.text_type(self.content_type.app_label),
-        six.text_type(self.content_type),
-        six.text_type(self.name))
-
-Permission.__str__ = custom
-
+    
 
 def uuid_name_definition(parent, str_uuid):
+    """
+    :param parent:
+    :param str_uuid:
+    :return: A uuid string of full branch( call from models local function)
+    """
     return (parent.get_uuid_name_definition() + " | " + str_uuid).lower()
 
 
@@ -26,7 +21,7 @@ def name_definition(title, parent):
 
 
 def get_permission_name(instance):
-    return 'crud | '+str(instance).lower()
+    return 'crud | '+str(instance)
 
 # from g3_dashboard import  settings
 
@@ -78,15 +73,17 @@ def send_mail(to, subject, msg_body, password=None):
             server.quit()
 
 
-def create_object_permission(app_label, model_name, per_codename, per_name):
+def create_object_permission(app_label, model_name, per_codename, per_name, uuid_codename):
     """
     Create permission on every object creations ...
     """
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
     permission = Permission.objects.get_or_create(
-        codename=per_codename.lower(),
-        name=per_name.lower(),
-        content_type=content_type
+        uuid_codename=uuid_codename,
+        defaults={'name': per_name.lower(),
+                  'content_type': content_type,
+                  'codename' : per_codename.lower()
+                  }
         )
 
     return permission

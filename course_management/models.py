@@ -25,6 +25,9 @@ class CommonInfo(models.Model):
     description = models.TextField(max_length=1500)
     created = models.DateTimeField(auto_now_add=True)
 
+    def str_code(self):
+        return str(self.code)
+
     class Meta:
         abstract = True
         ordering = ('title',)
@@ -140,12 +143,11 @@ class ModuleData(CommonInfo):
 
 for sender in [Course, Subject, Chapter, Topic, ModuleData]:
     """
-    Calls pre-save function to create the slug field
+    Calls pre-save function to create the slug field, add_selection_to_sessio and delete permission of object
     """
     pre_save.connect(pre_save_create_slug, sender=sender)
     pre_save.connect(add_current_objects_parent_to_request_session, sender=sender)
-
-    pre_save.connect(global_signal.update_permission_if_obj_update, sender=sender)
+    # pre_save.connect(global_signal.update_permission_if_obj_update, sender=sender)
     pre_delete.connect(delete_object_permission, sender=sender)
 
 

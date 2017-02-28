@@ -152,15 +152,8 @@ MAIL_GUN_DNS = 'sandbox3c2172091a0d419e867ec7bf45185cdb.mailgun.org'
 import django
 django.setup()
 
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Permission
-
-ContentType._meta.get_field("app_label").max_length = 1000
-Permission._meta.get_field("codename").max_length = 1000
-from django.db import models
-Permission.add_to_class('uuid_codename', models.CharField(max_length=1000))
-Permission._meta.get_field("codename")._unique = True
-Permission._meta.get_field("name").max_length = 1000
+import settings_conf
+# Permission.Meta.ordering = ['content_type__app_label']
 
 
 
