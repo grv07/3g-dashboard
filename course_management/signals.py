@@ -8,7 +8,7 @@ from django.utils.text import slugify
 def call_create_permission(sender, instance):
     create_object_permission(app_label='course_management', model_name=sender.__name__,
                              per_codename=instance.get_uuid_name_definition(),
-                             per_name=get_permission_name(instance),
+                             per_name=instance.str_code(),
                              uuid_codename=instance.str_code()
                              )
 
