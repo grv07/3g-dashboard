@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from datetime import datetime
+
 from content_uploader.models import Uploader, MyUser
 from course_management.models import ModuleData, Course, Chapter, Subject, Topic
 
@@ -19,10 +21,9 @@ class Task(models.Model):
     status = models.CharField(choices=status_fields, max_length=10, default='pp', blank=False)
     assign_to = models.ForeignKey(Uploader, blank=True)
     assigned_by = models.ForeignKey(MyUser, default=11, blank=False)
-    assigned_on = models.DateTimeField(auto_now_add=True)
+    assigned_on = models.DateTimeField(default=timezone.now, blank=True)
     due_date = models.DateField(default=timezone.now, blank=True)
-    # course_permission = models.ForeignKey(Course, blank=True, default=default_uuid)
-    # module_permission = models.ForeignKey(ModuleData, blank=True)
+    module_permission = models.ForeignKey(ModuleData, blank=True, default=default_uuid)
 
     def __str__(self):
         return self.title

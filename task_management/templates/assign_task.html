@@ -1,61 +1,51 @@
 {% extends 'home.html' %}
 {% block extend_head %}
 <script>
-                
         var filtered_permissions;
-
-        function filterSubjects(courseChoice){
+        $(document).ready(function() {    
             var uploader_id = $('#uploader').val();
-            console.log(uploader_id)
-            
             $.ajax({
                 url: "test_ajax",
                 method: "get",
                 dataType: 'json',
                 data: {'uploader_id': uploader_id},
                 success: function(data){
-                    console.log(data)
-                    filtered_permissions = data
+                    filtered_permissions = data;
+                    console.log('filtered permissions', filtered_permissions);
                 },
-                
-
+                error: function(){
+                    alert('Nothing')
+                }
             });
-            
-            console.log(filtered_permissions);
+            $('select').material_select();
+            });
+
+
+        function filterSubjects(courseChoice){
             var data_id = courseChoice.value;
-            var permission_name = courseChoice.id;
-            for(i in course_permission){
-                if(course_permission[i].id == data_id){
-                    filtered_permissions = course_permission[i].subjects;
+            for(var i=0; i<filtered_permissions.subject_permissions.length ; i++){
+                if(filtered_permissions.subject_permissions[i].course_id == data_id){
+                    var subjects = "<option value="+ filtered_permissions.subject_permissions[i].code +">"+ filtered_permissions.subject_permissions[i].title +"</option>";
+                    $('#subject_permission').append(subjects);
                 }
             }
-            console.log(filtered_permissions);
-
-            var subjects = "<option value="+data_id+">"+courseChoice.id+"</option>";
-            $('#subject_permission').append(subjects);
 
             $(document).ready(function() {
             $('select').material_select();
 
-            $.ajax({
-
-            })
-
         });
         };
 
+
         function filterChapters(subjectChoice){
             var data_id = subjectChoice.value;
-            console.log(data_id);
-            console.log(filtered_permissions);
-            for(var i=0; i < filtered_permissions.length; i++){
-                if(filtered_permissions[i]["id"] === data_id){
-                    filtered_permissions = filtered_permissions[i].chapter;
-                    console.log(filtered_permissions);
+            for(var i=0; i<filtered_permissions.chapter_permissions.length ; i++){
+                if(filtered_permissions.chapter_permissions[i].subject_id == data_id){
+                    var subjects = "<option value="+ filtered_permissions.chapter_permissions[i].code +">"+ filtered_permissions.chapter_permissions[i].title +"</option>";
+                    $('#chapter_permission').append(subjects);
                 }
             }
-            var subjects = "<option value="+data_id+">"+subjectChoice.id+"</option>";
-            $('#chapter_permission').append(subjects);
+
             $(document).ready(function() {
             $('select').material_select();
         });
@@ -63,15 +53,12 @@
 
         function filterTopics(chapterChoice){
             var data_id = chapterChoice.value;
-            console.log(data_id);
-            for(var i=0; i < filtered_permissions.length; i++){
-                if(filtered_permissions[i]["id"] === data_id){
-                    filtered_permissions = filtered_permissions[i].topic;
-                    console.log(filtered_permissions);
+            for(var i=0; i<filtered_permissions.topic_permissions.length ; i++){
+                if(filtered_permissions.topic_permissions[i].chapter_id == data_id){
+                    var subjects = "<option value="+ filtered_permissions.topic_permissions[i].code +">"+ filtered_permissions.topic_permissions[i].title +"</option>";
+                    $('#topic_permission').append(subjects);
                 }
             }
-            var subjects = "<option value="+data_id+">"+chapterChoice.id+"</option>";
-            $('#topic_permission').append(subjects);
 
             $(document).ready(function() {
             $('select').material_select();
@@ -80,19 +67,14 @@
 
 
         function filterModules(topicChoice){
-            $('#'+data_id).click(function(){
-
-            });
             var data_id = topicChoice.value;
-            console.log(data_id);
-            for(var i=0; i < filtered_permissions.length; i++){
-                if(filtered_permissions[i]["id"] === data_id){
-                    filtered_permissions = filtered_permissions[i].module;
-                    console.log(filtered_permissions);
+            for(var i=0; i<filtered_permissions.module_permissions.length ; i++){
+                if(filtered_permissions.module_permissions[i].topic_id == data_id){
+                    console.log('matched', filtered_permissions.module_permissions[i]);
+                    var subjects = "<option value="+ filtered_permissions.module_permissions[i].code +">"+ filtered_permissions.module_permissions[i].title +"</option>";
+                    $('#module_permission').append(subjects);
                 }
             }
-            var subjects = "<option value="+data_id+">"+topicChoice.id+"</option>";
-            $('#module_permission').append(subjects);
 
             $(document).ready(function() {
             $('select').material_select();
@@ -100,10 +82,7 @@
         };
 
         
-        $(document).ready(function() {
-            $('select').material_select();
-        });
-
+       
         
         $('.datepicker').pickadate({
             selectMonths: true,
@@ -134,7 +113,7 @@
                     <!--<select name="course_permission" id="course_permission" onmousedown="this.value" onchange="test()">-->
                         <option value="" disabled selected>Select Course</option>
                         {% for course in course_permissions %}
-                            <option value="course.code">{{ course.title }}</option>
+                            <option value="{{ course.code }}">{{ course.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -143,7 +122,7 @@
                     <select name="subject_permission" id="subject_permission" onchange="filterChapters(this)">
                         <option value="">Select Subject</option>
                         {% for subject in permissions.subject_permissions %}
-                        <option value="{{ subject.id }}">{{ subject.codename }}</option>
+                        <option value="{{ subject.code }}">{{ subject.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -152,7 +131,7 @@
                     <select name="chapter_permission" id="chapter_permission" onchange="filterTopics(this)">
                         <option value="">Select Chapter</option>
                         {% for chapter in permissions.chapter_permissions %}
-                        <option value="{{ chapter.id }}">{{ chapter.codename }}</option>
+                        <option value="{{ chapter.code }}">{{ chapter.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -161,7 +140,7 @@
                     <select name="topic_permission" id="topic_permission" onchange="filterModules(this)">
                         <option value="" disabled selected>Select Topic</option>
                         {% for topic in permissions.topic_permissions %}
-                        <option value="{{ topic.id }}">{{ topic.codename }}</option>
+                        <option value="{{ topic.code }}">{{ topic.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -170,7 +149,7 @@
                     <select name="module_permission" id="module_permission" multiple>
                         <option value="" disabled selected>Select module</option>
                         {% for module in permissions.module_permissions %}
-                        <option value="{{ module.code }}">{{ module.codename }}</option>
+                        <option value="{{ module.code }}">{{ module.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -184,16 +163,22 @@
                 <span style="color: red">{{ form.errors.title }}</span>
                 <div class="input-field col s6">
 
-                    <input id="title" type="text" data-length="50" name="title" maxlength="50" value="{{ form.title.value }}">
+                    <input id="title" type="text" data-length="50" name="title" maxlength="50" value="{{ form.title.value|default_if_none:"" }}">
                     <label for="title">Title</label>
                 </div>
             </div>
             <div class="row">
                 <span style="color: red">{{ form.errors.title }}</span>
                 <div class="input-field col s12">
-                    <input id="description" type="text" class="validate" name="description" value="{{ form.description.value }}">
+                    <input id="description" type="text" class="validate" name="description" value="{{ form.description.value|default_if_none:"" }}">
                     <label for="description">Task Description</label>
                 </div>
+            </div>
+
+            <div class="row">
+                <span style="color: red">{{ form.errors.title }}</span>
+                <label>Select start date</label>
+                <input type="date" class="datepicker" name="assigned_on" value="{{ form.assigned_on.value }}">
             </div>
 
             <div class="row">

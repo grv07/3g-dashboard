@@ -8,7 +8,14 @@ class UserLoginForm(forms.Form):
 
 
 class TaskAssignForm(forms.ModelForm):
+    due_date = forms.DateField(input_formats='%Y-%m-%d')
+    assigned_on = forms.DateField(input_formats='%Y-%m-%d')
 
     class Meta:
         model = Task
-        fields = ['title', 'description', 'due_date']
+        fields = ['title',
+                  'description',
+                  'assign_to',
+                  'module_permission',
+                  'due_date',
+                  'assigned_on']
