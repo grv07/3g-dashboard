@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.utils.text import slugify
 
 import inspect
-    
+
 
 def uuid_name_definition(parent, str_uuid):
     """
@@ -79,14 +79,14 @@ def create_object_permission(app_label, model_name, per_codename, per_name, uuid
     """
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
     permission = Permission.objects.get_or_create(
-        codename=per_codename.lower(),
         name=per_name.lower(),
-        content_type=content_type
         # uuid_codename=uuid_codename,
-        # defaults={'name': per_name.lower(),
-        #           'content_type': content_type,
-        #           'codename': per_codename.lower()
-        #           }
+        defaults={
+                  'uuid_codename': uuid_codename,
+                  # 'name': per_name.lower(),
+                  'content_type': content_type,
+                  'codename': per_codename.lower()
+                  }
         )
 
     return permission

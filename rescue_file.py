@@ -24,7 +24,9 @@ def rescue_codename_of_permission():
     # rescue_title_to_lower()
 
     def save_per_now(_perm, _instance):
+        # Step-1
         # _perm.uuid_codename = str(_instance.str_code())
+        # Step-2
         _perm.codename = _instance.get_uuid_name_definition()
         _perm.save()
 
@@ -34,7 +36,7 @@ def rescue_codename_of_permission():
 
     for perm in perm_list:
         name_string = perm.codename
-        if perm.id in [43, 44, 45, 47, 48, 49]:
+        if perm.id in [43, 44, 45, 47, 48, 49, 431, 432, 433]:
             perm_error_list.append(perm)
             continue
         _branches = name_string.split(' | ')
