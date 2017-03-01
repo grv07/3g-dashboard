@@ -25,9 +25,11 @@ def rescue_codename_of_permission():
 
     def save_per_now(_perm, _instance):
         # Step-1
-        # _perm.uuid_codename = str(_instance.str_code())
+        _perm.uuid_codename = _instance.str_code()
         # Step-2
         _perm.codename = _instance.get_uuid_name_definition()
+        # Step-3
+        # _perm.name = _instance.str_code()
         _perm.save()
 
     _count = 0
