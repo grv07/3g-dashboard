@@ -12,10 +12,10 @@
                     <div class="card teal darken-4">
                         <div class="card-content white-text">
                             <span class="card-title">{{ uploader.uploader.username }}</span>
-                                <p class="blue-text">Permissions alloted:</p>
+                                <p class="blue-text">Can upload data for:</p>
                                 <p class="green-text">
                                     {% for permission in uploader.permissions %}
-                                        {{ permission.codename }}<br>
+                                        {{ permission }}<br>
                                     {% endfor %}
                                 </p>
                             <div class="card-action">

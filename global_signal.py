@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from utils import send_mail, get_permission_name
+# from utils import send_mail, get_permission_name
 from constants import mail_template_constants
 
 
@@ -30,19 +30,26 @@ def update_permission_if_obj_update(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    try:
-        old = sender.objects.get(pk=instance.code)
-        if not get_permission_name(instance) == get_permission_name(old):
-            print('change in permission ...', get_permission_name(old))
-            permission = Permission.objects.get(name=get_permission_name(old))
-            permission.name = get_permission_name(instance)
-            permission.codename = str(instance).lower()
-            permission.save()
-        else:
-            print('No Change in permission ...')
-
-    except Exception as e:
-        print(e.args)
+    # try:
+    #     old = sender.objects.get(pk=instance.code)
+    #     if not get_permission_name(instance) == get_permission_name(old):
+    #         print('change in permission ...', get_permission_name(old))
+    #         uuid_codename = old.get_uuid_name_definition()
+    #         all_related_permissions = Permission.objects.filter(uuid_codename__icontains=uuid_codename)
+    #         # permission = Permission.objects.get(name=get_permission_name(old))
+    #         for permission in all_related_permissions:
+    #             # permission.name = get_permission_name(instance)
+    #             # permission.codename = str(instance).lower()
+    #             # permission.save()
+    #             print(permission.name)
+    #             print(sender.__name__, PERMISSION_NAME_FORMAT.index(sender.__name__))
+    #             print(permission.name.split(' | ')[PERMISSION_NAME_FORMAT.index(sender.__name__)])
+    #     else:
+    #         print('No Change in permission ...')
+    #
+    # except Exception as e:
+    #     print(e.args)
+    pass
 
 
 # def update_user_group(sender, instance, **kwargs):
@@ -92,7 +99,7 @@ def send_mail_on_user_create(sender, instance, **kwargs):
     register_subject = mail_template_constants.RESISTER_MSG.get('SUBJECT')
     register_body_template = mail_template_constants.RESISTER_MSG.get('MSG_BODY')
     register_body_template = register_body_template.format(user_name=instance.username, password=instance.password)
-    send_mail(instance.email, register_subject, register_body_template)
+    # send_mail(instance.email, register_subject, register_body_template)
 
 
 def change_log_msg(sender, instance, **kwargs):

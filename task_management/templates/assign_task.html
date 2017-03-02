@@ -20,6 +20,25 @@
             $('select').material_select();
             });
 
+        
+        function filterCourses(classChoice){
+            var data_id = classChoice.value;
+            for(var i=0; i<filtered_permissions.course_permissions.length; i++){
+                console.log('checking:',data_id, filtered_permissions.course_permissions[i].class_category_id)
+                if(filtered_permissions.course_permissions[i].class_category_id == data_id){
+                    console.log('Match found !!!')
+                    var courses = "<option value="+ filtered_permissions.course_permissions[i].code +">"+ filtered_permissions.course_permissions[i].title +"</option>";
+                    console.log(courses)
+                    $('#course_permission').append(courses);
+                }
+            }
+           
+            $(document).ready(function() {
+            $('select').material_select();
+
+        });
+        }
+
 
         function filterSubjects(courseChoice){
             var data_id = courseChoice.value;
@@ -65,7 +84,6 @@
         });
         };
 
-
         function filterModules(topicChoice){
             var data_id = topicChoice.value;
             for(var i=0; i<filtered_permissions.module_permissions.length ; i++){
@@ -80,9 +98,6 @@
             $('select').material_select();
         });
         };
-
-        
-       
         
         $('.datepicker').pickadate({
             selectMonths: true,
@@ -108,13 +123,19 @@
             {% csrf_token %}
             <div class="row">
                 <div>
-                    <label>Course</label>
-                    <select name="course_permission" id="course_permission" onchange="filterSubjects(this)">
+                    <label>Class</label>
+                    <select name="class_permission" id="class_permission" onchange="filterCourses(this)">
                     <!--<select name="course_permission" id="course_permission" onmousedown="this.value" onchange="test()">-->
-                        <option value="" disabled selected>Select Course</option>
-                        {% for course in course_permissions %}
-                            <option value="{{ course.code }}">{{ course.title }}</option>
+                        <option value="" disabled selected>Select Class</option>
+                        {% for class in class_data %}
+                            <option value="{{ class.code }}">{{ class.title }}</option>
                         {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Steram</label>
+                    <select name="course_permission" id="course_permission" onchange="filterSubjects(this)">
+                        <option value="" disabled selected>Select Steram</option>
                     </select>
                 </div>
                 <div>
@@ -136,9 +157,9 @@
                     </select>
                 </div>
                 <div>
-                    <label>Topic</label>
+                    <label>Concept</label>
                     <select name="topic_permission" id="topic_permission" onchange="filterModules(this)">
-                        <option value="" disabled selected>Select Topic</option>
+                        <option value="" disabled selected>Select Concept</option>
                         {% for topic in permissions.topic_permissions %}
                         <option value="{{ topic.code }}">{{ topic.title }}</option>
                         {% endfor %}

@@ -1,18 +1,19 @@
 import smtplib
-from django.utils import six
 from email.mime.text import MIMEText
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.utils.text import slugify
 
+import inspect
 
-def custom(self):
-    return "%s | %s" % (
-        # six.text_type(self.content_type.app_label),
-        six.text_type(self.content_type),
-        six.text_type(self.name))
 
-Permission.__str__ = custom
+def uuid_name_definition(parent, str_uuid):
+    """
+    :param parent:
+    :param str_uuid:
+    :return: A uuid string of full branch( call from models local function)
+    """
+    return (parent.get_uuid_name_definition() + " | " + str_uuid).lower()
 
 
 def name_definition(title, parent):
@@ -20,7 +21,7 @@ def name_definition(title, parent):
 
 
 def get_permission_name(instance):
-    return 'crud | '+str(instance).lower()
+    return 'crud | '+str(instance)
 
 # from g3_dashboard import  settings
 
@@ -72,15 +73,20 @@ def send_mail(to, subject, msg_body, password=None):
             server.quit()
 
 
-def create_object_permission(app_label, model_name, per_codename, per_name):
+def create_object_permission(app_label, model_name, per_codename, per_name, uuid_codename):
     """
     Create permission on every object creations ...
     """
     content_type = ContentType.objects.get(app_label=app_label.lower(), model=model_name.lower())
     permission = Permission.objects.get_or_create(
-        codename=per_codename.lower(),
-        name=per_name.lower(),
-        content_type=content_type
+        # name=per_name.lower(),
+        uuid_codename=uuid_codename,
+        defaults={
+                  # 'uuid_codename': uuid_codename,
+                  'name': per_name.lower(),
+                  'content_type': content_type,
+                  'codename': per_codename.lower()
+                  }
         )
 
     return permission
@@ -102,3 +108,21 @@ def create_slug(sender, instance, new_slug=None):
         new_slug = '%s-%s' %(slug, qs.count())
         return create_slug(sender, instance, new_slug=new_slug)
     return slug
+
+
+def add_current_objects_parent_to_request_session(sender, instance, **kwargs):
+    """
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return: Save objects code on pre_save
+             class data for get its parent's code when initialize form drop down.
+    """
+    for frame_record in inspect.stack():
+        if frame_record[3] == 'get_response':
+            request = frame_record[0].f_locals['request']
+            break
+    else:
+        request = None
+    if request:
+        request.session['LS:'+sender.__name__] = str(instance.code)
