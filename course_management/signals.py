@@ -1,7 +1,16 @@
 from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
-from utils import create_slug
+from utils import (create_slug, get_permission_name)
+from django.utils.text import slugify
+
+
+def call_create_permission(sender, instance):
+    create_object_permission(app_label='course_management', model_name=sender.__name__,
+                             per_codename=instance.get_uuid_name_definition(),
+                             per_name=instance.str_code(),
+                             uuid_codename=instance.str_code()
+                             )
 
 
 def update_user(sender, instance, **kwargs):
@@ -29,14 +38,11 @@ def create_course(sender, instance,  **kwargs):
     :param kwargs:
     :return: Call back API function when create a course
     """
-    print('done ....', instance.slug)
     from .serializers import CourseSerializer
     obj_serializer = CourseSerializer(instance)
     print(obj_serializer.data)
     # TODO: Call api when module create
-    create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+    call_create_permission(sender, instance)
 
 
 def create_subject(sender, instance, **kwargs):
@@ -52,9 +58,7 @@ def create_subject(sender, instance, **kwargs):
     from .serializers import SubjectSerializer
     obj_serializer = SubjectSerializer(instance)
     print(obj_serializer.data)
-    create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+    call_create_permission(sender, instance)
 
 
 def create_chapter(sender, instance, **kwargs):
@@ -70,9 +74,7 @@ def create_chapter(sender, instance, **kwargs):
     from .serializers import ChapterSerializer
     obj_serializer = ChapterSerializer(instance)
     print(obj_serializer.data)
-    create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+    call_create_permission(sender, instance)
 
 
 def create_topic(sender, instance, **kwargs):
@@ -88,9 +90,7 @@ def create_topic(sender, instance, **kwargs):
     from .serializers import TopicSerializer
     obj_serializer = TopicSerializer(instance)
     print(obj_serializer.data)
-    create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+    call_create_permission(sender, instance)
 
 
 def create_module(sender, instance, **kwargs):
@@ -106,9 +106,7 @@ def create_module(sender, instance, **kwargs):
     from .serializers import ModuleDataSerializer
     obj_serializer = ModuleDataSerializer(instance)
     print(obj_serializer.data)
-    create_object_permission(app_label='course_management', model_name=sender.__name__,
-                             per_codename=instance.slug,
-                             per_name='crud | '+instance.slug+' :'+str(instance.code)[:18])
+    call_create_permission(sender, instance)
 
 
 def pre_save_create_slug(sender, instance, **kwargs):
@@ -119,6 +117,25 @@ def pre_save_create_slug(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    if not instance.slug:
+    instance.title = instance.title.lower()
+    if not instance.slug == slugify(instance.title):
         instance.slug = create_slug(sender, instance)
 
+
+def delete_object_permission(sender, instance, **kwargs):
+    """
+    Delete a permission when delete model object
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    try:
+        permission = Permission.objects.get(
+            # codename=str(instance).lower(),
+            # name=get_permission_name(instance).lower(),
+            uuid_codename=instance.str_code()
+            )
+        permission.delete()
+    except Exception as e:
+        print(e.args)
