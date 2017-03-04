@@ -97,8 +97,8 @@ class MyUserAdmin(UserAdmin):
                         permissions_id.append(permission.id)
                 permissions_id += [perm.id for perm in Permission.objects.filter(user=request.user)]
                 permissions.queryset = permissions.queryset.filter(
-                    pk__in=permissions_id
-                )
+                    pk__in=permissions_id, content_type__model='moduledata'
+                ).exclude(name__icontains='Can')
             else:
                 print('###############')
                 form.base_fields['is_active'].widget = widgets.HiddenInput()
