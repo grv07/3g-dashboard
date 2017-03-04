@@ -116,33 +116,38 @@ def permissions(request, uploader_id):
 
     uploader_id = int(uploader_id)
 
-    course_perms = Permission.objects.filter(content_type_id__model='course', user=uploader_id)
-    for course in course_perms:
-        course_data.append(Course.objects.values('title', 'code', 'class_category_id').get(code=course.name))
-    for course in course_data:
-        course['code'] = str(course['code'])
-        course['class_category_id'] = str(course['class_category_id'])
+    # course_perms = Permission.objects.filter(content_type_id__model='course', user=uploader_id)
+    # for course in course_perms:
+    #     course_data.append(Course.objects.values('title', 'code', 'class_category_id').get(code=course.name))
+    # for course in course_data:
+    #     course['code'] = str(course['code'])
+    #     course['class_category_id'] = str(course['class_category_id'])
+    #
+    # subject_perms = Permission.objects.filter(content_type_id__model='subject', user=uploader_id)
+    # for subject in subject_perms:
+    #     subject_content.append(Subject.objects.values('title', 'code', 'course_id').get(code=subject.name))
+    # for subject in subject_content:
+    #     subject['code'] = str(subject['code'])
+    #     subject['course_id'] = str(subject['course_id'])
+    #
+    # chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=uploader_id)
+    # for chapter in chapter_perms:
+    #     chapter_content.append(Chapter.objects.values('title', 'code', 'subject_id').get(code=chapter.name))
+    # for chapter in chapter_content:
+    #     chapter['code'] = str(chapter['code'])
+    #     chapter['subject_id'] = str(chapter['subject_id'])
+    #
+    # topic_perms = Permission.objects.filter(content_type_id__model='topic', user=uploader_id)
+    # for topic in topic_perms:
+    #     topic_content.append(Topic.objects.values('title', 'code', 'chapter_id').get(code=topic.name))
+    # for topic in topic_content:
+    #     topic['code'] = str(topic['code'])
+    #     topic['chapter_id'] = str(topic['chapter_id'])
 
-    subject_perms = Permission.objects.filter(content_type_id__model='subject', user=uploader_id)
-    for subject in subject_perms:
-        subject_content.append(Subject.objects.values('title', 'code', 'course_id').get(code=subject.name))
-    for subject in subject_content:
-        subject['code'] = str(subject['code'])
-        subject['course_id'] = str(subject['course_id'])
-
-    chapter_perms = Permission.objects.filter(content_type_id__model='chapter', user=uploader_id)
-    for chapter in chapter_perms:
-        chapter_content.append(Chapter.objects.values('title', 'code', 'subject_id').get(code=chapter.name))
-    for chapter in chapter_content:
-        chapter['code'] = str(chapter['code'])
-        chapter['subject_id'] = str(chapter['subject_id'])
-
-    topic_perms = Permission.objects.filter(content_type_id__model='topic', user=uploader_id)
-    for topic in topic_perms:
-        topic_content.append(Topic.objects.values('title', 'code', 'chapter_id').get(code=topic.name))
-    for topic in topic_content:
-        topic['code'] = str(topic['code'])
-        topic['chapter_id'] = str(topic['chapter_id'])
+    topic_perms = []
+    for module in module_content:
+        topic_perms.append(Topic.objects.values('title', 'code', 'chapter_id').get(code=module.topic_id))
+    # for
 
     module_perms = Permission.objects.filter(content_type_id__model='moduledata', user=uploader_id)
     for module in module_perms:
