@@ -50,8 +50,8 @@ def logout_user(request):
 def get_uploaders(request):
     admin_id = request.user.id
     uploader_list = []
-    uploader_permissions = []
     for uploader in MyUser.objects.filter(owner=admin_id):
+        uploader_permissions = []
         uploader_module_permissions = Permission.objects.filter(content_type_id__model='moduledata', user=uploader.id)
         for module_permission in uploader_module_permissions:
             uploader_permissions.append(ModuleData.objects.get(code=module_permission.name))
@@ -84,7 +84,7 @@ def assign_task(request, uploader_id):
     form = TaskAssignForm(request.POST or None)
     if form.is_valid():
         task = form.save(commit=False)
-        task.status = 'ASSIGN'
+        task.status = 'PENDING'
         task.assign_to_id = Uploader.objects.values_list('id', flat=True).get(user_id=uploader_id)
         task.assigned_by_id = request.user.id
         task.module_permission = ModuleData.objects.get(code=request.POST.get('module_permission'))
@@ -169,7 +169,7 @@ def edit_task(request, task_id):
     form = TaskAssignForm(request.POST or None, instance=task)
     if form.is_valid():
         task = form.save(commit=False)
-        task.status = 'ASSIGN'
+        task.status = 'PENDING'
         task.assign_to_id = request.POST.get('assign_to')
         task.assigned_by_id = request.user.id
         form.save()
@@ -193,6 +193,25 @@ def delete_task(request, task_id):
         raise Http404
 
 
+def task_complete(request, task_id):
+    """
+    To change the status of the task to completed, by the uploader.
+    :param request:
+    :param task_id:
+    :return:
+    """
+    if request.user.is_active:
+
+        task = get_object_or_404(Task, pk=task_id)
+        print(task.status)
+        task.status = 'UNDER REVIEW'
+        print(task.status)
+        task.save()
+        return redirect('task_management:dashboard')
+    else:
+        raise Http404
+
+
 def upload_task_data(request, task_id):
     """
     Open view for uploading data
@@ -203,4 +222,3 @@ def upload_task_data(request, task_id):
     if request.user.is_active:
         task = get_object_or_404(Task, pk=task_id)
         return render(request, 'detail.html', {'task': task})
-
