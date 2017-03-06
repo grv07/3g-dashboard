@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, pre_save, m2m_changed, pre_delet
 import global_signal
 from .signals import *
 from django.contrib.admin.models import LogEntry
-from content_uploader.models import MyUser
+from content_uploader.models import MyUser, Uploader
 
 from utils import (name_definition, add_current_objects_parent_to_request_session, uuid_name_definition)
 
@@ -162,6 +162,7 @@ post_save.connect(create_topic, sender=Topic)
 post_save.connect(create_module, sender=ModuleData)
 
 pre_save.connect(global_signal.change_user_type, sender=MyUser)
+pre_delete.connect(global_signal.delete_uploader, sender=Uploader)
 
 # User permissions edit
 m2m_changed.connect(global_signal.update_user, sender=User.user_permissions.through)
