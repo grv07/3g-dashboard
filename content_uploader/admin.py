@@ -146,10 +146,11 @@ class UploaderAdmin(admin.ModelAdmin):
         if 'user' in form.base_fields:
             user = form.base_fields['user']
             # get all uploader with user id
-            all_uploader_user_id = Uploader.objects.values_list('user_id', flat=True)
+            # all_uploader_user_id = Uploader.objects.values_list('user_id', flat=True)
             # get all uploader created current user
             # ex: avail existing remaining user = (all created user)-(all users that are used before for uploader)
-            user.queryset = MyUser.objects.filter(owner=request.user.id).filter(~Q(pk__in=all_uploader_user_id))
+            user.queryset = MyUser.objects.filter(owner=request.user.id, type='DEFAULT')
+            # .filter(~Q(pk__in=all_uploader_user_id))
 
         return form
 
