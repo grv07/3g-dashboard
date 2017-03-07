@@ -117,7 +117,6 @@ def pre_save_create_slug(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    instance.title = instance.title.lower()
     if not instance.slug == slugify(instance.title):
         instance.slug = create_slug(sender, instance)
 
