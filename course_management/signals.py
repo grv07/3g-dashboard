@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
-from utils import (create_slug, get_permission_name)
+from utils import (create_slug)
 from django.utils.text import slugify
 
 
@@ -117,7 +117,6 @@ def pre_save_create_slug(sender, instance, **kwargs):
     :param kwargs:
     :return:
     """
-    instance.title = instance.title.lower()
     if not instance.slug == slugify(instance.title):
         instance.slug = create_slug(sender, instance)
 

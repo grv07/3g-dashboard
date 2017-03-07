@@ -28,6 +28,9 @@ class CommonInfo(models.Model):
     def str_code(self):
         return str(self.code)
 
+    def clean(self):
+        self.title = self.title.lower()
+
     class Meta:
         abstract = True
         ordering = ('title',)

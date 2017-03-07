@@ -23,9 +23,8 @@ class BoardCategory(models.Model):
     def get_uuid_name_definition(self):
         return str(self.code)
     
-    def save(self, force_insert=False, force_update=False):
+    def clean(self):
         self.title = self.title.lower()
-        super(BoardCategory, self).save(force_insert, force_update)
         
 
 class ClassCategory(models.Model):
@@ -42,7 +41,7 @@ class ClassCategory(models.Model):
         ordering = ('title',)
         verbose_name_plural = "Grades"
         verbose_name = "Grade"
-        unique_together = ('title', 'board', )
+        unique_together = ('board', 'title')
         
     def __str__(self):
         """Return course title and first 8 char"""
@@ -50,9 +49,8 @@ class ClassCategory(models.Model):
 
     def get_uuid_name_definition(self):
         return uuid_name_definition(self.board, str(self.code))
-    
-    def save(self, force_insert=False, force_update=False):
+
+    def clean(self):
         self.title = self.title.lower()
-        super(ClassCategory, self).save(force_insert, force_update)
 
 # Create your models here.
