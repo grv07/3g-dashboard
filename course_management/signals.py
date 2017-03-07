@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission
 from utils import create_object_permission
 
-from utils import (create_slug, get_permission_name)
+from utils import (create_slug)
 from django.utils.text import slugify
 
 
