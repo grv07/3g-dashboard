@@ -88,6 +88,18 @@ def change_user_type(sender, instance, **kwargs):
     print('update/create user call ...')
 
 
+def delete_uploader(sender, instance, **kwargs):
+    """
+    On uploader delete set admins value to default
+    :param sender:
+    :param instance:
+    :param kwargs:
+    :return:
+    """
+    instance.user.type = 'DEFAULT'
+    instance.user.save()
+
+
 def send_mail_on_user_create(sender, instance, **kwargs):
     """
     Call on post_save when user create

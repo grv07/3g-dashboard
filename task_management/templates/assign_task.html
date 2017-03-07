@@ -142,36 +142,24 @@
                     <label>Subject</label>
                     <select name="subject_permission" id="subject_permission" onchange="filterChapters(this)">
                         <option value="">Select Subject</option>
-                        {% for subject in permissions.subject_permissions %}
-                        <option value="{{ subject.code }}">{{ subject.title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
                 <div>
                     <label>Chapter</label>
                     <select name="chapter_permission" id="chapter_permission" onchange="filterTopics(this)">
                         <option value="">Select Chapter</option>
-                        {% for chapter in permissions.chapter_permissions %}
-                        <option value="{{ chapter.code }}">{{ chapter.title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
                 <div>
                     <label>Concept</label>
                     <select name="topic_permission" id="topic_permission" onchange="filterModules(this)">
                         <option value="" disabled selected>Select Concept</option>
-                        {% for topic in permissions.topic_permissions %}
-                        <option value="{{ topic.code }}">{{ topic.title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
                 <div>
                     <label>Module</label>
-                    <select name="module_permission" id="module_permission" multiple>
+                    <select name="module_permission" id="module_permission">
                         <option value="" disabled selected>Select module</option>
-                        {% for module in permissions.module_permissions %}
-                        <option value="{{ module.code }}">{{ module.title }}</option>
-                        {% endfor %}
                     </select>
                 </div>
             </div>

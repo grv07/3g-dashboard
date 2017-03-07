@@ -4,21 +4,22 @@ from django.utils import timezone
 from datetime import datetime
 
 from content_uploader.models import Uploader, MyUser
-from course_management.models import ModuleData, Course, Chapter, Subject, Topic
+from course_management.models import ModuleData
 
 
 default_uuid = 'fd395736-523c-43bf-9653-cfe5ddd23528'
-status_fields = [('ASSIGN', 'assign'), ('COMPLETE', 'complete')]
+status_fields = [('PENDING', 'pending'), ('COMPLETE', 'complete'), ('UNDER REVIEW', 'under review'),
+                 ('WORKING', 'working')]
 
 
 class Task(models.Model):
     """
-    Task model for assigning task to the content uploader.kkk
+    Task model for assigning task to the content uploader.
     """
     # title, description, progress_status, assigned_by, assigned_to
     title = models.CharField(max_length=250, blank=False)
     description = models.TextField(max_length=1000, blank=False)
-    status = models.CharField(choices=status_fields, max_length=10, default='pp', blank=False)
+    status = models.CharField(choices=status_fields, max_length=20, default='PENDING', blank=False)
     assign_to = models.ForeignKey(Uploader, blank=True)
     assigned_by = models.ForeignKey(MyUser, default=11, blank=False)
     assigned_on = models.DateTimeField(default=timezone.now, blank=True)
