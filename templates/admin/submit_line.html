@@ -3,13 +3,13 @@
 <script>
         // pop up box when save a user
         var selected_options = function(){
-            var temp = '<br><br><br><span style="color:red;">';
+            var temp = '<div style="color:red; text-align:left; margin-left:38%;">';
             pp = $('#id_user_permissions_to').find('option');
             pp.each(function( index ) {
-              temp=temp+index + ": " + $( this ).text()+'</br>'
+              temp=temp + "<p>"+index + " --  " + $( this ).text()+'</p>'
             });
 
-            return temp+'</span>';
+            return temp+'</div>';
 
         }
         function save_submit(id_name){

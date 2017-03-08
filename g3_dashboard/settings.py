@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'classes',
     'course_management',
     'logentry_admin',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
