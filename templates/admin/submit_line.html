@@ -3,19 +3,29 @@
 <script>
         // pop up box when save a user
         var selected_options = function(){
-            var temp = '<div style="color:red; text-align:left; margin-left:38%;">';
+            var temp = '<div style="color:#ff9933; text-align:left; margin:3%;">';
+
+            var collect_permissions = '<b style="color:#99cc00;">:: PERMISSIONS LIST ::</b></br>';
             pp = $('#id_user_permissions_to').find('option');
             pp.each(function( index ) {
-              temp=temp + "<p>"+index + " --  " + $( this ).text()+'</p>'
+              collect_permissions=collect_permissions + "<p>"+(index+1) + " >  " + $( this ).text()+'</p>'
             });
 
-            return temp+'</div>';
+            var collect_group = '<b style="color:#99cc00;">:: GROUPS LIST ::</b></br>';
+            gp = $('#id_groups_to').find('option');
+            gp.each(function(index) {
+              collect_group = collect_group + "<p>"+(index+1) + " >  " + $( this ).text()+'</p>'
+            });
+
+            var final_msg_list = (gp.length > 0 ? collect_group+'<hr><br>' : '') + (pp.length > 0 ? collect_permissions : '')
+
+            return '<div style="color:#ff9933; text-align:left; margin-left:38%;">'+final_msg_list+'</div>';
 
         }
         function save_submit(id_name){
             $.confirm({
                 title: 'Alert!',
-                content: 'Confirm Your Permissions! '+selected_options(),
+                content: '<span style="color:#ff99bb">** Confirm Your Group/Permissions Before Make A Change! **</span></br></br>'+selected_options(),
                 theme: 'supervan',
                 closeIcon: true,
                 buttons: {
