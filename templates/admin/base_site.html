@@ -1,6 +1,10 @@
 {% extends "admin/base.html" %}
 {% load i18n static %}
-
+{% block extrastyle %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.css">
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.1.0/jquery-confirm.min.js"></script>
+{% endblock %}
 {% block title %}{{ title }} | 3G Admin-Dash Board {% endblock %}
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">3G Admin Dash Board</a></h1>
