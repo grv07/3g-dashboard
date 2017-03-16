@@ -17,9 +17,9 @@ def update_user(sender, instance, **kwargs):
             permissions = Permission.objects.filter(user=instance)
             # TODO: Call api when update user permissions
         except Exception as e:
-            print(e.args)
+            print('Update user signal ---', e.args)
     else:
-        print('pre add call')
+        print(instance, 'pre add call')
 
 
 def update_permission_if_obj_update(sender, instance, **kwargs):
