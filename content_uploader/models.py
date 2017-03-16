@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.models.signals import pre_save
 from .signal import create_user_to_uploader
 from django.contrib.auth.models import AbstractUser
+# from logentry_admin.admin import LogEntryAdmin
 
 
 class MyUser(AbstractUser):
