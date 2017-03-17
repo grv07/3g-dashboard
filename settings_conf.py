@@ -3,9 +3,10 @@
 # \\\\\\\\\\\\\\\///////////////////////////////\\\\\\\\\\\\\\\\
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.db import models
 from constants.global_constant import PERMISSION_CODENAME_FORMAT
+from django.contrib.auth import get_user_model
 
 ContentType._meta.get_field("app_label").max_length = 1000
 Permission._meta.get_field("codename").max_length = 1000
@@ -28,3 +29,5 @@ Permission._meta.get_field("codename")._unique = True
 Permission._meta.get_field("name").max_length = 1000
 
 Permission.__str__ = custom
+
+Group.add_to_class('owner', models.ForeignKey(get_user_model()))

@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['52.79.170.101', '*']
 
 
 INSTALLED_APPS = [
+    'admin_view_permission',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,6 +82,14 @@ TEMPLATES = [
     },
 ]
 
+ADMIN_VIEW_PERMISSION_MODELS = [
+    # auth.User,
+    'course_management.Course',
+    'course_management.Subject',
+    'course_management.Chapter',
+    'course_management.Topic',
+    'course_management.ModuleData',
+]
 
 WSGI_APPLICATION = 'g3_dashboard.wsgi.application'
 

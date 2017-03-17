@@ -40,6 +40,26 @@ def get_permission_name(instance):
 #                       "emails/month for free."})
 
 
+def get_users_permissions_list(request, permissions):
+    if request.user.is_superuser:
+        permissions_queryset = permissions.queryset.all()
+    elif request.user.is_staff:
+        permissions_id = []
+        for group in request.user.groups.all():
+            for permission in group.permissions.all():
+                permissions_id.append(permission.id)
+        # print(permissions_id)
+        for perm in Permission.objects.filter(user=request.user):
+            permissions_id.append(perm.id)
+
+        permissions_queryset = permissions.queryset.filter(
+            pk__in=permissions_id, content_type__model='moduledata'
+        ).exclude(name__icontains='Can')
+    else:
+        permissions_queryset = permissions.queryset.filter(user=request.user)
+    return permissions_queryset
+
+
 def send_mail(to, subject, msg_body, password=None):
     """
     Call to send email on users email address
