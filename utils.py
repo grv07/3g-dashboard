@@ -7,6 +7,11 @@ from django.utils.text import slugify
 import inspect
 
 
+def get_log_msg(instance, **kwargs):
+    instance.change_message = str(instance)
+    return instance
+
+
 def uuid_name_definition(parent, str_uuid):
     """
     :param parent:
