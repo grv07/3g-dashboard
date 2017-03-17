@@ -136,7 +136,6 @@ class MyUserAdmin(UserAdmin):
             permissions.queryset = get_users_permissions_list(request, permissions)
 
         if 'groups' in form.base_fields:
-            # if request.user.is_superuser:
             groups = form.base_fields['groups']
             if not request.user.is_superuser:
                 groups.queryset = groups.queryset.filter(owner=request.user)

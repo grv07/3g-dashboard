@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Permission
 # from utils import send_mail, get_permission_name
 from constants import mail_template_constants
+from utils import get_log_msg
 
 
 def update_user(sender, instance, **kwargs):
@@ -115,6 +116,6 @@ def send_mail_on_user_create(sender, instance, **kwargs):
 
 
 def change_log_msg(sender, instance, **kwargs):
-    msg = "Has been changed by {user}".\
-        format(**{'user': instance.user})
-    instance.change_message = msg
+    # msg = "Has been changed by {user}".\
+    #     format(**{'user': instance.user})
+    get_log_msg(instance, **kwargs)
