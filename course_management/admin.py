@@ -4,6 +4,22 @@ from annoying.functions import get_object_or_None
 
 admin.site.register(Course)
 
+GLOBAL_LIST_DISPLAY = ('get_title', 'is_live',)
+
+
+def custom_queryset(self, request, _class):
+    """
+    Cutom query set for hidden on delete
+    :param self:
+    :param request:
+    :param _class:
+    :return:
+    """
+    qs = super(_class, self).get_queryset(request)
+    if not request.user.is_superuser:
+        qs = qs.filter(is_live=True)
+    return qs
+
 
 def get_initial_return(request, _class, _parent_class):
     """
@@ -37,6 +53,14 @@ def get_initial_return(request, _class, _parent_class):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
+    list_display = GLOBAL_LIST_DISPLAY
+
+    def get_title(self, obj):
+        return str(obj)
+
+    def get_queryset(self, request):
+        return custom_queryset(self, request, SubjectAdmin)
+
     def get_changeform_initial_data(self, request):
         """
         :param request:
@@ -47,6 +71,14 @@ class SubjectAdmin(admin.ModelAdmin):
 
 @admin.register(Chapter)
 class ChapterAdmin(admin.ModelAdmin):
+    list_display = GLOBAL_LIST_DISPLAY
+
+    def get_title(self, obj):
+        return str(obj)
+
+    def get_queryset(self, request):
+        return custom_queryset(self, request, ChapterAdmin)
+
     def get_changeform_initial_data(self, request):
         """
         :param request:
@@ -57,6 +89,14 @@ class ChapterAdmin(admin.ModelAdmin):
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
+    list_display = GLOBAL_LIST_DISPLAY
+
+    def get_title(self, obj):
+        return str(obj)
+
+    def get_queryset(self, request):
+        return custom_queryset(self, request, TopicAdmin)
+
     def get_changeform_initial_data(self, request):
         """
         :param request:
@@ -67,6 +107,14 @@ class TopicAdmin(admin.ModelAdmin):
 
 @admin.register(ModuleData)
 class ModuleDataAdmin(admin.ModelAdmin):
+    list_display = GLOBAL_LIST_DISPLAY
+
+    def get_title(self, obj):
+        return str(obj)
+
+    def get_queryset(self, request):
+        return custom_queryset(self, request, ModuleDataAdmin)
+
     def get_changeform_initial_data(self, request):
         """
         :param request:

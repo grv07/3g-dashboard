@@ -21,15 +21,25 @@ class CommonInfo(models.Model):
     Abstract class for reduce size of lines .. ;)
     """
     title = models.TextField(max_length=100)
-    slug = models.SlugField(editable=False, max_length=110)
+    slug = models.SlugField(editable=False, max_length=150)
     description = models.TextField(max_length=1500)
+    is_live = models.BooleanField(default=True)
+
     created = models.DateTimeField(auto_now_add=True)
+    # Add a manager to override functionality of get_query set
+    # objects = HideDeletedObjectListFilterManager()
 
     def str_code(self):
         return str(self.code)
 
     def clean(self):
         self.title = self.title.lower()
+
+    def delete(self):
+        if self.is_live:
+            self.is_live = False
+            self.save()
+            Permission.objects.get(name=self.code).delete()
 
     class Meta:
         abstract = True
@@ -50,7 +60,7 @@ class Course(CommonInfo):
         ordering = ('class_category__title', 'title',)
 
     def __str__(self):
-        """Retrun slug and first 8 char"""
+        """Return slug and first 8 char"""
         return name_definition(self.title, self.class_category)
 
     def get_uuid_name_definition(self):
