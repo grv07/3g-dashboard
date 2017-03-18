@@ -23,6 +23,9 @@ class CustomGroupAdmin(GroupAdmin):
     """
     Customize group class entries
     """
+    def get_queryset(self, request):
+        """How admin list is filter"""
+        return Group.objects.filter(id__lt=20)
 
     def save_model(self, request, obj, form, change):
         """

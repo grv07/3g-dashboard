@@ -7,6 +7,15 @@ from django.utils.text import slugify
 import inspect
 
 
+def hide_all_related_child(instance):
+    from constants.global_constant import (PERMISSION_CODENAME_FORMAT, PERMISSION_NAME_FORMAT)
+    _class_name = instance.__class__.__name__
+    _parent_key = instance.code
+    _modal_name = PERMISSION_CODENAME_FORMAT.get(_class_name.lower())
+    _loop_on_child_modal = PERMISSION_NAME_FORMAT[PERMISSION_NAME_FORMAT.index(_modal_name)+1:]
+    print(_loop_on_child_modal)
+
+
 def get_log_msg(instance, **kwargs):
     instance.change_message = str(instance)
     return instance
