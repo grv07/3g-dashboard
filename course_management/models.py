@@ -66,6 +66,10 @@ class Course(CommonInfo):
     def get_uuid_name_definition(self):
         return uuid_name_definition(self.class_category, str(self.code))
 
+    def chained_relation(self):
+        print('Hello gaurav ...')
+        return self.item_set.filter(is_present=True)
+
 
 class Subject(CommonInfo):
     """

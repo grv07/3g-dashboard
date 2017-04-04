@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import RedirectView
+from course_management import views
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='/admin')),
     url(r'^admin/', admin.site.urls),
+    url(r'^filter/fields/', views.filter_field),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'country_state',
     'content_uploader',
     'classes',
     'course_management',
