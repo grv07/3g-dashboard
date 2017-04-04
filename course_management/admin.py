@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (Course, Subject, Chapter, Topic, ModuleData)
 from annoying.functions import get_object_or_None
 
-from .forms import TopicForm
+from .forms import (SubjectForm, TopicForm, ChapterForm,)
 
 admin.site.register(Course)
 
@@ -70,6 +70,8 @@ class SubjectAdmin(admin.ModelAdmin):
         """
         return get_initial_return(request, Subject, 'course')
 
+    form = SubjectForm
+
 
 @admin.register(Chapter)
 class ChapterAdmin(admin.ModelAdmin):
@@ -87,6 +89,8 @@ class ChapterAdmin(admin.ModelAdmin):
         :return: set initial value on parent drop-down for all modules.
         """
         return get_initial_return(request, Chapter, 'subject')
+
+    form = ChapterForm
 
 
 @admin.register(Topic)

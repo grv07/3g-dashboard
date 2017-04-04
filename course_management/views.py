@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from .models import Chapter
 from constants.global_constant import PARENT_KEY_CHILD_VALUE
 
 
 def filter_field(request):
-    print(request.POST)
+    # print(request.POST)
     if request.method == 'POST':
-        print(request.POST['model_name'])
+        # print(request.POST['model_name'])
         filter_on = request.POST['field_name']
         model_obj = PARENT_KEY_CHILD_VALUE.get(filter_on)
 
@@ -38,5 +37,5 @@ def filter_field(request):
         #     pass
         # if request.POST['module_data']:
         #     pass
-    return render(request, 'test/filter.html', {'values': data_list})
+    return render(request, 'form_filter/_options.html', {'values': data_list})
 # Create your views here.
