@@ -11,3 +11,51 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+{% block footer %}
+<div id="footer">
+<script>
+    function filter_field(data, field_name, child_name){
+        console.log(data);
+        data['field_name'] = field_name;
+        $.post( "/filter/fields/", data, function( data ) {
+          $( "#"+child_name ).html( data );
+        });
+    }
+
+    function collect_data(){
+        data = {}
+        data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
+        data['model_name'] = '{{ opts.model_name }}';
+        data['country'] = $('#id_country').val();
+        data['state'] = $('#id_state').val();
+        data['stream'] = $('#id_stream').val();
+        data['subject'] = $('#id_subject').val();
+
+        return data;
+    }
+
+    $('#id_country').change(function(){
+        filter_field(collect_data(), 'country', 'id_state');
+    });
+
+    $('#id_state').change(function(){
+        filter_field(collect_data(), 'state', 'id_stream');
+    });
+
+    $('#id_stream').change(function(){
+        filter_field(collect_data(), 'stream', 'id_subject');
+    });
+
+    $('#id_subject').change(function(){
+        filter_field(collect_data(), 'subject', 'id_chapter');
+    });
+
+    //$('#id_chapter').change(function(){
+    //    console.log('Country Change ...');
+    //});
+
+
+
+</script>
+</div>
+{% endblock %}

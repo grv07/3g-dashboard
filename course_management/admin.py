@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import Course, Subject, Chapter, Topic, ModuleData
+from .models import (Course, Subject, Chapter, Topic, ModuleData)
 from annoying.functions import get_object_or_None
+
+from .forms import TopicForm
 
 admin.site.register(Course)
 
@@ -103,6 +105,23 @@ class TopicAdmin(admin.ModelAdmin):
         :return: set initial value on parent drop-down for all modules.
         """
         return get_initial_return(request, Topic, 'chapter')
+
+    def save_model(self, request, obj, form, change):
+        """
+        Add owner value on every user object.
+
+        :param request:
+        :param obj:
+        :param form:
+        :param change:
+        :return:
+        """
+        print(form.data)
+        obj.owner = request.user.id
+        print('Save now ..')
+        super(TopicAdmin, self).save_model(request, obj, form, change)
+
+    form = TopicForm
 
 
 @admin.register(ModuleData)
