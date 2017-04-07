@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from utils import (name_definition, uuid_name_definition)
+# from country_state.models import State
 
 
 class BoardCategory(models.Model):
@@ -9,6 +10,7 @@ class BoardCategory(models.Model):
     """
     title = models.CharField(max_length=100, unique=True)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    state = models.ForeignKey('country_state.State')
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -25,7 +27,7 @@ class BoardCategory(models.Model):
     
     def clean(self):
         self.title = self.title.lower()
-        
+
 
 class ClassCategory(models.Model):
     """

@@ -3,9 +3,8 @@ from constants.global_constant import PARENT_KEY_CHILD_VALUE
 
 
 def filter_field(request):
-    # print(request.POST)
+    print(request.POST)
     if request.method == 'POST':
-        # print(request.POST['model_name'])
         filter_on = request.POST['field_name']
         model_obj = PARENT_KEY_CHILD_VALUE.get(filter_on)
 
@@ -17,6 +16,11 @@ def filter_field(request):
 
         if filter_on == 'subject':
             data_list = data_list.filter(subject__code=request.POST['subject'])
+
+        if filter_on == 'board':
+            data_list = data_list.filter(board__code=request.POST['board'])
+            print(data_list)
+            return render(request, 'form_filter/_grade_options.html', {'values': data_list})
 
         # for key, value in FILTER_ON_DYNAMIC_MODELS.items():
         #     if not key == request.POST['app_name']:

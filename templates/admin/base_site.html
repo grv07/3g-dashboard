@@ -27,6 +27,8 @@
         data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
         data['model_name'] = '{{ opts.model_name }}';
         data['country'] = $('#id_country').val();
+        data['board'] = $('#id_board').val();
+        data['grade'] = $('#id_grade').val();
         data['state'] = $('#id_state').val();
         data['stream'] = $('#id_stream').val();
         data['subject'] = $('#id_subject').val();
@@ -39,7 +41,15 @@
     });
 
     $('#id_state').change(function(){
-        filter_field(collect_data(), 'state', 'id_stream');
+        filter_field(collect_data(), 'state', 'id_board');
+    });
+
+    $('#id_board').change(function(){
+        filter_field(collect_data(), 'board', 'id_select_grade');
+    });
+
+    $('#id_select_grade').change(function(){
+        filter_field(collect_data(), 'stream', 'id_stream');
     });
 
     $('#id_stream').change(function(){
@@ -54,7 +64,10 @@
     //    console.log('Country Change ...');
     //});
 
-
+    if("{{ opts.model_name }}" == "classcategory"){
+        $('#top_form_msg').html("<li style='color:blue;'>Select grade or enter in title for new or both.</li>");
+        // Add a msg on top of form.
+    }
 
 </script>
 </div>
