@@ -1,10 +1,12 @@
 
 from django.contrib import admin
+from django.contrib import messages
+from django.utils.safestring import mark_safe
+
 from .models import ClassCategory, BoardCategory
-from .forms import CreateGradeFilterForm
+from .forms import CreateGradeFilterForm, ChangeGradeFilterForm
 
 import uuid
-from constants.global_constant import GLOBAL_LIST_DISPLAY
 
 # admin.site.register(ClassCategory)
 admin.site.register(BoardCategory)
@@ -24,7 +26,15 @@ def custom_queryset(self, request, _class):
 class BoardCategoryAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(BoardCategoryAdmin, self).get_form(request, obj, **kwargs)
+        """
+        Separate form for add and edit functionality
+        """
+        if obj:
+            self.form = ChangeGradeFilterForm
+            form = super(BoardCategoryAdmin, self).get_form(request, obj, **kwargs)
+        else:
+            self.form = CreateGradeFilterForm
+            form = super(BoardCategoryAdmin, self).get_form(request, obj, **kwargs)
         return form
 
     def get_title(self, obj):
@@ -39,10 +49,18 @@ class BoardCategoryAdmin(admin.ModelAdmin):
         Add a new in form field as select_grade then loop on it and set obj grade
             and save obj in bulk.
         """
+        print(change)
+        obj.board_id = form.data.getlist('select_board')[0]
         grade_pk_list = form.data.getlist('select_grade')
-        for grade_pk in grade_pk_list:
-            obj.grade_id = grade_pk
-            obj.owner = request.user.id
-            obj.code = uuid.uuid4()
+        grade_title_list = [ClassCategory.objects.get(pk=grade_pk).title for grade_pk in grade_pk_list]
+        msg = mark_safe('The Grade "{0}" was added successfully. You may add another Grade below.')
+        if obj.title:
+            grade_title_list.append(obj.title)
+        for grade_title in set(grade_title_list):
+            obj.title = grade_title
+            if not change:
+                obj.code = uuid.uuid4()
             obj.save()
-    form = CreateGradeFilterForm
+            messages.add_message(request, messages.INFO, msg.format(str(obj)))
+
+

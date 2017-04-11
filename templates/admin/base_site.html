@@ -14,11 +14,12 @@
 {% block footer %}
 <div id="footer">
 <script>
-    function filter_field(data, field_name, child_name){
+    function filter_field(data, field_name, child_names){
         console.log(data);
         data['field_name'] = field_name;
         $.post( "/filter/fields/", data, function( data ) {
-          $( "#"+child_name ).html( data );
+            $("#id_"+child_names).html(data[0]['option_data']);
+            $("#id_hidden_"+child_names).val(data[0]['hidden_field_value']);
         });
     }
 
@@ -27,9 +28,9 @@
         data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
         data['model_name'] = '{{ opts.model_name }}';
         data['country'] = $('#id_country').val();
-        data['board'] = $('#id_board').val();
+        data['board'] = $('#id_select_board').val();
         data['grade'] = $('#id_grade').val();
-        data['state'] = $('#id_state').val();
+        data['state'] = $('#id_select_state').val();
         data['stream'] = $('#id_stream').val();
         data['subject'] = $('#id_subject').val();
 
@@ -37,27 +38,27 @@
     }
 
     $('#id_country').change(function(){
-        filter_field(collect_data(), 'country', 'id_state');
+        filter_field(collect_data(), 'country', 'select_state');
     });
 
-    $('#id_state').change(function(){
-        filter_field(collect_data(), 'state', 'id_board');
+    $('#id_select_state').change(function(){
+        filter_field(collect_data(), 'state', 'select_board');
     });
 
-    $('#id_board').change(function(){
-        filter_field(collect_data(), 'board', 'id_select_grade');
+    $('#id_select_board').change(function(){
+        filter_field(collect_data(), 'board', 'select_grade');
     });
 
     $('#id_select_grade').change(function(){
-        filter_field(collect_data(), 'stream', 'id_stream');
+        filter_field(collect_data(), 'stream', 'stream');
     });
 
     $('#id_stream').change(function(){
-        filter_field(collect_data(), 'stream', 'id_subject');
+        filter_field(collect_data(), 'stream', 'subject');
     });
 
     $('#id_subject').change(function(){
-        filter_field(collect_data(), 'subject', 'id_chapter');
+        filter_field(collect_data(), 'subject', 'chapter');
     });
 
     //$('#id_chapter').change(function(){

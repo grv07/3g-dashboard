@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (Course, Subject, Chapter, Topic, ModuleData)
 from annoying.functions import get_object_or_None
-from .forms import (StreamForm, SubjectForm, TopicForm, ChapterForm,)
+from .forms import (StreamForm, ChangeStreamForm, SubjectForm, TopicForm, ChapterForm,)
 from constants.global_constant import GLOBAL_LIST_DISPLAY
 
 import uuid
@@ -57,6 +57,12 @@ class StreamAdmin(admin.ModelAdmin):
     list_display = GLOBAL_LIST_DISPLAY
 
     def get_form(self, request, obj=None, **kwargs):
+
+        if obj:
+            self.form = ChangeStreamForm
+        else:
+            self.form = StreamForm
+
         form = super(StreamAdmin, self).get_form(request, obj, **kwargs)
         return form
 
@@ -76,7 +82,8 @@ class StreamAdmin(admin.ModelAdmin):
         for grade_pk in grade_pk_list:
             obj.grade_id = grade_pk
             obj.owner = request.user.id
-            obj.code = uuid.uuid4()
+            if not change:
+                obj.code = uuid.uuid4()
             obj.save()
     form = StreamForm
 
