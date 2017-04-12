@@ -5,7 +5,7 @@ from classes.forms import (BasicCountryStateFilterForm, ChangeBasicCountryStateF
 
 from constants.global_constant import (MULTI_SELECT_GRADE_HELP, PRE_SELECT_GRADE_MSG)
 
-from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
+# from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
 
 GLOBAL_FORM_HIDE_LIST = ('is_live',)
 
@@ -42,7 +42,8 @@ class StreamForm(BasicCountryStateFilterForm):
 
     def clean(self):
         cleaned_data = super(StreamForm, self).clean()
-        refile_form_from_hidden_fields(self, grade_type={'type': 'multi_select'})
+        # refile_form_from_hidden_fields(self, grade_type={'type': 'multi_select'})
+        self.set_drop_downs_in_form_via_hidden(**{'grade': {'type': 'multi_select'}})
         title = self.data.get('title')
         select_grade_list = self.select_grade_clean(self.data.getlist('select_grade'))
         if not (select_grade_list or title):
@@ -89,7 +90,8 @@ class ChangeStreamForm(ChangeBasicCountryStateFilterForm):
                      }
 
         self.fields['select_grade'].help_text = PRE_SELECT_GRADE_MSG.format(selected_grade)
-        set_drop_downs_in_form(self, **_set_data)
+        self.set_drop_downs_in_form_via_data_set(**_set_data)
+        # set_drop_downs_in_form(self, **_set_data)
 
     class Meta:
         model = Course

@@ -4,7 +4,7 @@ from django import forms
 from country_state.models import (Country)
 from .models import (ClassCategory, BoardCategory)
 from course_management.models import Course
-from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
+# from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
 
 from constants.global_constant import MULTI_SELECT_GRADE_HELP
 
@@ -40,6 +40,70 @@ class BasicFilterField(forms.ModelForm):
                     error_on_grade.append(ClassCategory.objects.get(pk=grade_pk).title)
 
         return error_on_grade
+
+    def get_options_from_hidden_filed(self, value_str):
+        """
+        return options = [('key', 'val'), ... .. ]
+        Get options to add on form fields when error happen.
+        """
+        _options = []
+        data_list = value_str.strip('||').split('||') if value_str else []
+
+        for data in data_list:
+            value = data.split(':')
+            _options.append((value[0], value[1]))
+        return _options
+
+    def set_drop_downs_in_form_via_hidden(self, **kwargs):
+        # print(kwargs)
+        _field_list = self.fields.keys()
+
+        if 'select_state' in _field_list:
+            SELECT_STATE_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_state'))
+            self.fields['select_state'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + SELECT_STATE_OPTIONS)
+
+        if 'select_board' in _field_list:
+            SELECT_BOARD_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_board'))
+            self.fields['select_board'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + SELECT_BOARD_OPTIONS)
+
+        if 'select_grade' in _field_list:
+            SELECT_GRADE_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_grade'))
+            if 'grade' in kwargs.keys():
+                if kwargs['grade']['type'] == 'multi_select':
+                    self.fields['select_grade'].widget = \
+                        forms.CheckboxSelectMultiple(choices=SELECT_GRADE_OPTIONS)
+                elif kwargs['grade']['type'] == 'radio_select':
+                    self.fields['select_grade'].widget = \
+                        forms.RadioSelect(choices=SELECT_GRADE_OPTIONS)
+            else:
+                self.fields['select_grade'].widget = \
+                    forms.Select(choices=[('', '--- Select One ---')] + SELECT_GRADE_OPTIONS)
+
+    def set_drop_downs_in_form_via_data_set(self, **kwargs):
+        _field_list = self.fields.keys()
+
+        if 'select_state' in _field_list:
+            self.fields['select_state'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_STATE_OPTIONS'])
+
+        if 'select_board' in _field_list:
+            self.fields['select_board'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_BOARD_OPTIONS'])
+
+        if 'select_grade' in _field_list:
+            if 'grade' in kwargs.keys():
+                if kwargs['grade']['type'] == 'multi_select':
+                    print('under chaeck box ...')
+                    self.fields['select_grade'].widget = \
+                        forms.CheckboxSelectMultiple(choices=kwargs['SELECT_GRADE_OPTIONS'])
+                elif kwargs['grade']['type'] == 'radio_select':
+                    self.fields['select_grade'].widget = \
+                        forms.RadioSelect(choices=kwargs['SELECT_GRADE_OPTIONS'])
+            else:
+                self.fields['select_grade'].widget = \
+                    forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_GRADE_OPTIONS'])
 
 
 class BasicCountryStateFilterForm(BasicFilterField):
@@ -97,7 +161,7 @@ class CreateGradeFilterForm(BasicCountryStateFilterForm):
 
     def clean(self):
         cleaned_data = super(CreateGradeFilterForm, self).clean()
-        refile_form_from_hidden_fields(self, grade_type={'type': 'multi_select'})
+        self.set_drop_downs_in_form_via_hidden(**{'grade': {'type': 'multi_select'}})
         title = self.data.get('title')
         select_grade_list = self.data.getlist('select_grade')
         if not (select_grade_list or title):
@@ -129,7 +193,8 @@ class ChangeGradeFilterForm(ChangeBasicCountryStateFilterForm):
         # /// ....------
         set_data = {'SELECT_STATE_OPTIONS': country_state.get('state_list', []), 'SELECT_BOARD_OPTIONS': board_list,
                     'SELECT_GRADE_OPTIONS': [], 'grade': {'type': 'multi_select'}}
-        set_drop_downs_in_form(self, **set_data)
+        self.set_drop_downs_in_form_via_data_set(**set_data)
+        # set_drop_downs_in_form(self, **set_data)
 
     class Meta:
         model = ClassCategory
