@@ -111,6 +111,42 @@ def filter_field(request):
 
             return JsonResponse(data, safe=False)
 
+        # TOPIC FORM CALLS
+        if model_name == 'topic':
+            if filter_on == 'board':
+                data_list = PARENT_KEY_CHILD_VALUE.get('grade').objects.\
+                    filter(grade__board__pk=request.POST['board']).order_by('title', '-created').distinct('title')
+                data = get_ajax_response(data_list, 'form_filter/_stream_title_select.html', 'title',
+                                         html_add_on_id='select_stream')
+
+            if filter_on == 'stream':
+                stream_title = request.POST['stream']
+                data_list = PARENT_KEY_CHILD_VALUE.get('board').objects.filter(board__pk=request.POST['board'],
+                                                                               course__title=stream_title)
+                data = get_ajax_response(data_list, 'form_filter/_options.html', 'code',
+                                         html_add_on_id='select_grade')
+
+            if filter_on == 'grade':
+                grades_list = request.POST.get('select_grade')
+                stream_title = request.POST.get('stream')
+                board_pk = request.POST.get('board')
+                data_list = PARENT_KEY_CHILD_VALUE.get('stream').objects.\
+                    filter(course__grade__pk=grades_list, course__title=stream_title,
+                           course__grade__board__pk=board_pk)
+                data = get_ajax_response(data_list,
+                                         'form_filter/_options.html',
+                                         'code', value_name='name_define',
+                                         html_add_on_id='select_subject')
+
+            if filter_on == 'subject':
+                selected_subject_pk = request.POST.get('subject')
+                data_list = PARENT_KEY_CHILD_VALUE.get('subject').objects.filter(subject__pk=selected_subject_pk)
+                data = get_ajax_response(data_list,
+                                         'form_filter/_options.html',
+                                         'code')
+
+            return JsonResponse(data, safe=False)
+
         if model_name == 'course':
             if filter_on == 'board':
                 data_list = data_list.filter(board__pk=request.POST['board'])

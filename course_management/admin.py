@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (Course, Subject, Chapter, Topic, ModuleData)
 from annoying.functions import get_object_or_None
-from .forms import (StreamForm, ChangeStreamForm, AddSubjectForm, ChangeSubjectForm, TopicForm,
+from .forms import (StreamForm, ChangeStreamForm, AddSubjectForm, ChangeSubjectForm, TopicForm, ChangeTopicForm,
                     AddChapterForm, ChangeChapterForm)
 from constants.global_constant import GLOBAL_LIST_DISPLAY
 # from classes.models import BoardCategory, ClassCategory
@@ -168,6 +168,15 @@ class ChapterAdmin(admin.ModelAdmin):
 class TopicAdmin(admin.ModelAdmin):
     list_display = GLOBAL_LIST_DISPLAY
 
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            self.form = ChangeTopicForm
+        else:
+            self.form = TopicForm
+
+        form = super(TopicAdmin, self).get_form(request, obj, **kwargs)
+        return form
+
     def get_title(self, obj):
         return str(obj)
 
@@ -185,10 +194,12 @@ class TopicAdmin(admin.ModelAdmin):
         """
         Add owner value on every user object.
         """
-        obj.owner = request.user.id
+        # obj.owner = request.user.id
+        selected_chapter_pk = form.data.get('select_chapter')
+        obj.chapter_id = selected_chapter_pk
+        if not change:
+            obj.code = uuid.uuid4()
         super(TopicAdmin, self).save_model(request, obj, form, change)
-
-    form = TopicForm
 
 
 @admin.register(ModuleData)

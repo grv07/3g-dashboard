@@ -3,7 +3,7 @@ from django import forms
 # from django.shortcuts import get_object_or_404
 from country_state.models import (Country)
 from .models import (ClassCategory, BoardCategory)
-from course_management.models import (Course, Subject)
+from course_management.models import (Course, Subject, Chapter, Topic)
 # from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
 
 from constants.global_constant import MULTI_SELECT_GRADE_HELP
@@ -65,14 +65,27 @@ class BasicFilterField(forms.ModelForm):
                                         'and grade(s)- "{1}"'.format(stream_title, ','.join(error_on_grade)))
 
     def _check_grade_course_subject_chapter_title_uniqueness(self):
-        selected_grades = self.data.getlist('select_grade')
-        selected_grades = self.select_grade_clean(selected_grades)
-        stream_title = self.data.get('select_stream')
-        topic_title = self.data.get('title')
-        for grades_pk in selected_grades:
-            pass
+        """Chapter name will not be repeated in the same grade in same subject."""
+        selected_grade_pk = self.data.get('select_grade')
+        subject_pk = self.data.get('select_subject')
+        title = self.data.get('title')
+        try:
+            Chapter.objects.get(title=title, subject__pk=subject_pk, subject__course__grade__pk=selected_grade_pk)
+        except Chapter.DoesNotExist as e:
+            print(e.args)
+        else:
+            raise forms.ValidationError("Chapter already exist with this title, board and subject.")
 
-
+    def _unique_topic_form_title(self):
+        """Concept name will not be repeated in the same chapter."""
+        title = self.data.get('title')
+        chapter_pk = self.data.get('select_chapter')
+        try:
+            Topic.objects.get(title=title, chapter__pk=chapter_pk)
+        except Topic.DoesNotExist as e:
+            print(e.args)
+        else:
+            raise forms.ValidationError("Concept already exist with this title in Chapter.")
 
     def get_options_from_hidden_filed(self, value_str):
         """
@@ -90,6 +103,7 @@ class BasicFilterField(forms.ModelForm):
     def set_drop_downs_in_form_via_hidden(self, **kwargs):
         # print(kwargs)
         _field_list = self.fields.keys()
+        print(_field_list)
 
         if 'select_state' in _field_list:
             SELECT_STATE_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_state'))
@@ -130,6 +144,12 @@ class BasicFilterField(forms.ModelForm):
             self.fields['select_subject'].widget = \
                 forms.Select(choices=[('', '--- Select One ---')] + SELECT_SUBJECT_OPTIONS)
 
+        if 'select_chapter' in _field_list:
+            SELECT_CHAPTER_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_chapter'))
+            print(SELECT_CHAPTER_OPTIONS)
+            self.fields['select_chapter'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + SELECT_CHAPTER_OPTIONS)
+
     def set_drop_downs_in_form_via_data_set(self, **kwargs):
         _field_list = self.fields.keys()
 
@@ -165,6 +185,10 @@ class BasicFilterField(forms.ModelForm):
             else:
                 self.fields['select_grade'].widget = \
                     forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_GRADE_OPTIONS'])
+
+        if 'select_chapter' in _field_list:
+            self.fields['select_chapter'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_CHAPTER_OPTIONS'])
 
 
 class BasicCountryStateFilterForm(BasicFilterField):

@@ -142,6 +142,7 @@ class AddSubjectForm(BasicFilterWithGrade):
 
     def clean(self):
         cleaned_data = super(AddSubjectForm, self).clean()
+        print(cleaned_data)
         self.set_drop_downs_in_form_via_hidden(**{'grade': {'type': self.grade_type}})
         return cleaned_data
 
@@ -272,6 +273,10 @@ class ChangeChapterForm(ChangeSubjectForm):
         self.fields['select_grade'].help_text = PRE_SELECT_GRADE_MSG.format(selected_grade)
         self.set_drop_downs_in_form_via_data_set(**_set_data)
 
+    def clean_title(self):
+        self._check_grade_course_subject_chapter_title_uniqueness()
+        return self.data['title']
+
     class Meta:
         model = Chapter
         fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'select_subject',
@@ -279,10 +284,82 @@ class ChangeChapterForm(ChangeSubjectForm):
 
 
 class TopicForm(AddChapterForm):
-    # stream = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
-    # subject = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
+    select_chapter = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+    hidden_select_chapter = forms.CharField(widget=forms.HiddenInput())
+
+    def clean_title(self):
+        """Concept name will not be repeated in the same chapter."""
+        self._unique_topic_form_title()
+        return self.data['title']
 
     class Meta:
         model = Topic
-        fields = ['country', 'select_state', 'select_board', 'select_grade', 'select_stream', 'select_subject', 'chapter', 'title', 'description']
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'select_subject',
+                  'select_chapter', 'title', 'description']
+
+
+class ChangeTopicForm(BasicChangeFormWithGrade):
+    title = forms.CharField(required=True)
+    select_stream = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+    select_subject = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+    select_chapter = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+
+    def __init__(self, *args, **kwargs):
+        if 'instance' in kwargs:
+            topic_obj = kwargs['instance']
+            chapter_obj = topic_obj.chapter
+            subject_obj = chapter_obj.subject
+            selected_stream = subject_obj.course
+            selected_grade = selected_stream.grade
+            selected_board = selected_grade.board
+            selected_state = selected_board.state
+            selected_country = selected_state.country
+
+            initial = {
+                       'select_state': selected_state.id,
+                       'title': topic_obj.title,
+                       'country': selected_country.id,
+                       'select_board': str(selected_board.code),
+                       'select_grade': str(selected_grade.code),
+                       'select_stream': str(selected_stream.title),
+                       'select_subject': str(subject_obj.code),
+                       'select_chapter': str(chapter_obj.code)
+                       }
+
+            kwargs['initial'] = initial
+        super(ChangeTopicForm, self).__init__(*args, **kwargs)
+        # /// Common Functions
+        country_state = selected_board.get_country_state_list()
+        board_list = list(BoardCategory.objects.filter_by_state(selected_state))
+        # //// .......
+        avail_grades_in_selected_board = ClassCategory.objects.filter_by_board(selected_board)
+        avail_stream_in_selected_board = Course.objects.get_distinct_stream_via_board(selected_board.pk)
+        avail_subject_in_selected_chapter = Subject.objects.\
+            get_distinct_stream_via_grade(selected_stream.title, selected_grade.pk)
+
+        avail_chapter_in_selected_subject = Chapter.objects.values_list('code', 'title').filter(subject__pk=subject_obj.code)
+
+        _set_data = {
+                     'SELECT_STATE_OPTIONS': country_state.get('state_list', []),
+                     'SELECT_BOARD_OPTIONS': board_list,
+                     'SELECT_GRADE_OPTIONS': list(avail_grades_in_selected_board),
+                     'SELECT_STREAM_OPTIONS': list(avail_stream_in_selected_board),
+                     'SELECT_SUBJECT_OPTIONS': list(avail_subject_in_selected_chapter),
+                     'SELECT_CHAPTER_OPTIONS': list(avail_chapter_in_selected_subject),
+                     'grade': {'type': 'drop_down_select'}
+                     }
+
+        self.fields['select_grade'].help_text = PRE_SELECT_GRADE_MSG.format(selected_grade)
+        self.set_drop_downs_in_form_via_data_set(**_set_data)
+
+    def clean_title(self):
+        """Concept name will not be repeated in the same chapter."""
+        self._unique_topic_form_title()
+        return self.data['title']
+
+    class Meta:
+        model = Topic
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'select_subject',
+                  'select_chapter', 'title', 'description']
+
 

@@ -20,7 +20,7 @@ class CommonInfo(models.Model):
     """
     Abstract class for reduce size of lines .. ;)
     """
-    title = models.TextField(max_length=100)
+    title = models.TextField(blank=False, max_length=100)
     slug = models.SlugField(editable=False, max_length=150)
     description = models.TextField(max_length=1500)
     is_live = models.BooleanField(default=True)
