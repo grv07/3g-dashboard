@@ -2,8 +2,10 @@ from django.contrib import admin
 
 from .models import (Course, Subject, Chapter, Topic, ModuleData)
 from annoying.functions import get_object_or_None
-from .forms import (StreamForm, ChangeStreamForm, SubjectForm, TopicForm, ChapterForm,)
+from .forms import (StreamForm, ChangeStreamForm, AddSubjectForm, ChangeSubjectForm, TopicForm,
+                    AddChapterForm, ChangeChapterForm)
 from constants.global_constant import GLOBAL_LIST_DISPLAY
+# from classes.models import BoardCategory, ClassCategory
 
 import uuid
 
@@ -92,6 +94,16 @@ class StreamAdmin(admin.ModelAdmin):
 class SubjectAdmin(admin.ModelAdmin):
     list_display = GLOBAL_LIST_DISPLAY
 
+    def get_form(self, request, obj=None, **kwargs):
+
+        if obj:
+            self.form = ChangeSubjectForm
+        else:
+            self.form = AddSubjectForm
+
+        form = super(SubjectAdmin, self).get_form(request, obj, **kwargs)
+        return form
+
     def get_title(self, obj):
         return str(obj)
 
@@ -105,12 +117,31 @@ class SubjectAdmin(admin.ModelAdmin):
         """
         return get_initial_return(request, Subject, 'course')
 
-    form = SubjectForm
+    def save_model(self, request, obj, form, change):
+        selected_grades_pk = form.data.getlist('select_grade')
+        selected_stream_title = form.data.get('select_stream')
+        stream_grade_list = Course.objects.filter(grade__pk__in=selected_grades_pk, title=selected_stream_title)
+
+        for stream in stream_grade_list:
+            obj.course = stream
+            print(obj.title)
+            if not change:
+                obj.code = uuid.uuid4()
+            obj.save()
 
 
 @admin.register(Chapter)
 class ChapterAdmin(admin.ModelAdmin):
     list_display = GLOBAL_LIST_DISPLAY
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            self.form = ChangeChapterForm
+        else:
+            self.form = AddChapterForm
+
+        form = super(ChapterAdmin, self).get_form(request, obj, **kwargs)
+        return form
 
     def get_title(self, obj):
         return str(obj)
@@ -125,7 +156,12 @@ class ChapterAdmin(admin.ModelAdmin):
         """
         return get_initial_return(request, Chapter, 'subject')
 
-    form = ChapterForm
+    def save_model(self, request, obj, form, change):
+        selected_subject_pk = form.data.get('select_subject')
+        obj.subject_id = selected_subject_pk
+        if not change:
+            obj.code = uuid.uuid4()
+        obj.save()
 
 
 @admin.register(Topic)

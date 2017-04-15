@@ -46,12 +46,18 @@ class CommonInfo(models.Model):
         ordering = ('title',)
 
 
+class CourseManager(models.Manager):
+    def get_distinct_stream_via_board(self, board_pk):
+        return self.values_list('title', 'title').filter(grade__board__pk=board_pk).order_by('title', '-created').distinct('title')
+
+
 class Course(CommonInfo):
     """
     Course class for CRUD
     """
     grade = models.ForeignKey('classes.ClassCategory', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    objects = CourseManager()
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "1. Stream"
@@ -71,12 +77,18 @@ class Course(CommonInfo):
         return self.item_set.filter(is_present=True)
 
 
+class SubjectManager(models.Manager):
+    def get_distinct_stream_via_grade(self, stream_title, grade_pk):
+        return self.values_list('code', 'title').filter(course__title=stream_title, course__grade__pk=grade_pk)
+
+
 class Subject(CommonInfo):
     """
     Subject class for CRUD
     """
     course = models.ForeignKey('Course', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    objects = SubjectManager()
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "2. Subject"
@@ -98,6 +110,7 @@ class Chapter(CommonInfo):
     Chapter class for CRUD
     """
     subject = models.ForeignKey('Subject', default=default_uuid)
+    chapter_number = models.PositiveIntegerField()
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):

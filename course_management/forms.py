@@ -21,7 +21,13 @@ GLOBAL_FORM_HIDE_LIST = ('is_live',)
 
 
 class BasicFilterWithGrade(BasicCountryStateFilterForm):
-    select_grade = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
+    select_grade = forms.CharField(widget=forms.CheckboxSelectMultiple,
+                                   help_text='Please select above fields')
+
+
+class BasicChangeFormWithGrade(ChangeBasicCountryStateFilterForm):
+    select_grade = forms.CharField(widget=forms.CheckboxSelectMultiple,
+                                   help_text='Please select above fields')
 
 
 class StreamForm(BasicCountryStateFilterForm):
@@ -34,6 +40,7 @@ class StreamForm(BasicCountryStateFilterForm):
 
     def clean_select_grade(self):
         select_grade_list = self.data.getlist('select_grade')
+        select_grade_list = self.select_grade_clean(select_grade_list)
         error_on_grade = self._check_stream_grade_uniqueness(select_grade_list)
 
         if error_on_grade:
@@ -54,8 +61,7 @@ class StreamForm(BasicCountryStateFilterForm):
 class ChangeStreamForm(ChangeBasicCountryStateFilterForm):
     title = forms.CharField(required=True)
     # select_grade = forms.CharField(widget=forms.CheckboxSelectMultiple, help_text=MULTI_SELECT_GRADE_HELP)
-    select_grade = forms.CharField(widget=forms.RadioSelect(),
-                                   help_text='')
+    select_grade = forms.CharField(widget=forms.RadioSelect(), help_text='')
 
     def __init__(self, *args, **kwargs):
         """
@@ -98,13 +104,12 @@ class ChangeStreamForm(ChangeBasicCountryStateFilterForm):
         fields = ['country', 'select_state', 'select_board', 'select_grade', 'title', 'description']
 
     def clean_select_grade(self):
-        select_grade_list = self.data.getlist('select_grade').remove('')
+        select_grade_list = self.data.getlist('select_grade')
+        select_grade_list = self.select_grade_clean(select_grade_list)
         error_on_grade = []
-        if select_grade_list:
-            select_grade_list.remove('')
-            for grade_pk in select_grade_list:
-                if Course.objects.filter(title=self.data.get('title'), grade__code=grade_pk).exists():
-                    error_on_grade.append(ClassCategory.objects.get(pk=grade_pk).title)
+        for grade_pk in select_grade_list:
+            if Course.objects.filter(title=self.data.get('title'), grade__code=grade_pk).exists():
+                error_on_grade.append(ClassCategory.objects.get(pk=grade_pk).title)
 
         if error_on_grade:
             raise forms.ValidationError("Stream already exists for {0}".format(', '.join(error_on_grade)))
@@ -119,27 +124,165 @@ class ChangeStreamForm(ChangeBasicCountryStateFilterForm):
         return cleaned_data
 
 
-class SubjectForm(BasicFilterWithGrade):
-    stream = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
+class AddSubjectForm(BasicFilterWithGrade):
+    hidden_select_stream = forms.CharField(widget=forms.HiddenInput())
+    select_stream = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+    title = forms.CharField(required=True)
+
+    grade_type = 'multi_select'
 
     class Meta:
         model = Subject
-        fields = ['country', 'select_state', 'select_board', 'select_grade',  'course', 'title', 'description']
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'title', 'description']
+
+    def clean_title(self):
+        print('under clean ...')
+        self._check_grade_course_subject_title_uniqueness()
+        return self.data['title']
+
+    def clean(self):
+        cleaned_data = super(AddSubjectForm, self).clean()
+        self.set_drop_downs_in_form_via_hidden(**{'grade': {'type': self.grade_type}})
+        return cleaned_data
 
 
-class ChapterForm(BasicFilterWithGrade):
-    stream = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
-    
+class ChangeSubjectForm(BasicChangeFormWithGrade):
+    select_stream = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+    title = forms.CharField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        if 'instance' in kwargs:
+            subject_obj = kwargs['instance']
+            selected_stream = subject_obj.course
+            selected_grade = selected_stream.grade
+            selected_board = selected_grade.board
+            selected_state = selected_board.state
+            selected_country = selected_state.country
+            print(selected_stream)
+            initial = {'select_state': selected_state.id,
+                       'title': subject_obj.title,
+                       'country': selected_country.id,
+                       'select_board': str(selected_board.code),
+                       'select_grade': str(selected_grade.code),
+                       'select_stream': str(selected_stream.title),
+                       }
+
+            kwargs['initial'] = initial
+        super(ChangeSubjectForm, self).__init__(*args, **kwargs)
+        # /// Common Functions
+        country_state = selected_board.get_country_state_list()
+        board_list = list(BoardCategory.objects.filter_by_state(selected_state))
+        # //// .......
+        avail_grades_in_selected_board = ClassCategory.objects.filter_by_board(selected_board)
+        avail_stream_in_selected_board = Course.objects.get_distinct_stream_via_board(selected_board.pk)
+
+        print(avail_stream_in_selected_board)
+
+        _set_data = {
+                     'SELECT_STATE_OPTIONS': country_state.get('state_list', []),
+                     'SELECT_BOARD_OPTIONS': board_list,
+                     'SELECT_GRADE_OPTIONS': list(avail_grades_in_selected_board),
+                     'SELECT_STREAM_OPTIONS': list(avail_stream_in_selected_board),
+                     'grade': {'type': 'radio_select'}
+                     }
+
+        self.fields['select_grade'].help_text = PRE_SELECT_GRADE_MSG.format(selected_grade)
+        self.set_drop_downs_in_form_via_data_set(**_set_data)
+        # set_drop_downs_in_form(self, **_set_data)
+
+    class Meta:
+        model = Subject
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'title', 'description']
+
+    def clean_title(self):
+        print('under clean ...')
+        self._check_grade_course_subject_title_uniqueness()
+        return self.data['title']
+
+    def clean(self):
+        cleaned_data = super(ChangeSubjectForm, self).clean()
+        # self.set_drop_downs_in_form_via_hidden(**{'grade': {'type': 'multi_select'}})
+        return cleaned_data
+
+
+class AddChapterForm(AddSubjectForm):
+    select_grade = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]), help_text='')
+    select_subject = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]),
+                                     help_text='Please select above fields')
+    hidden_select_subject = forms.CharField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        self.grade_type = 'drop_down_select'
+        super(AddChapterForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Chapter
-        fields = ['country', 'select_state', 'select_board', 'select_grade', 'stream', 'subject', 'title', 'description']
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'select_subject',
+                  'title', 'chapter_number', 'description']
+
+    def clean_title(self):
+        self._check_grade_course_subject_chapter_title_uniqueness()
+        return self.data['title']
 
 
-class TopicForm(BasicFilterWithGrade):
-    stream = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
-    subject = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
+class ChangeChapterForm(ChangeSubjectForm):
+    select_grade = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]), help_text='')
+    select_subject = forms.CharField(widget=forms.Select(choices=[('', '--- Select One ---')]))
+
+    def __init__(self, *args, **kwargs):
+        if 'instance' in kwargs:
+            chapter_obj = kwargs['instance']
+            subject_obj = chapter_obj.subject
+            selected_stream = subject_obj.course
+            selected_grade = selected_stream.grade
+            selected_board = selected_grade.board
+            selected_state = selected_board.state
+            selected_country = selected_state.country
+
+            initial = {'select_state': selected_state.id,
+                       'title': chapter_obj.title,
+                       'country': selected_country.id,
+                       'select_board': str(selected_board.code),
+                       'select_grade': str(selected_grade.code),
+                       'select_stream': str(selected_stream.title),
+                       'select_subject': str(subject_obj.code)
+                       }
+
+            kwargs['initial'] = initial
+        super(ChangeSubjectForm, self).__init__(*args, **kwargs)
+        # /// Common Functions
+        country_state = selected_board.get_country_state_list()
+        board_list = list(BoardCategory.objects.filter_by_state(selected_state))
+        # //// .......
+        avail_grades_in_selected_board = ClassCategory.objects.filter_by_board(selected_board)
+        avail_stream_in_selected_board = Course.objects.get_distinct_stream_via_board(selected_board.pk)
+        avail_subject_in_selected_chapter = Subject.objects.\
+            get_distinct_stream_via_grade(selected_stream.title, selected_grade.pk)
+
+        print(avail_subject_in_selected_chapter)
+        _set_data = {
+                     'SELECT_STATE_OPTIONS': country_state.get('state_list', []),
+                     'SELECT_BOARD_OPTIONS': board_list,
+                     'SELECT_GRADE_OPTIONS': list(avail_grades_in_selected_board),
+                     'SELECT_STREAM_OPTIONS': list(avail_stream_in_selected_board),
+                     'SELECT_SUBJECT_OPTIONS': list(avail_subject_in_selected_chapter),
+                     'grade': {'type': 'drop_down_select'}
+                     }
+
+        self.fields['select_grade'].help_text = PRE_SELECT_GRADE_MSG.format(selected_grade)
+        self.set_drop_downs_in_form_via_data_set(**_set_data)
+
+    class Meta:
+        model = Chapter
+        fields = ['country', 'select_state', 'select_board', 'select_stream', 'select_grade', 'select_subject',
+                  'title', 'chapter_number', 'description']
+
+
+class TopicForm(AddChapterForm):
+    # stream = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
+    # subject = forms.CharField(required=False, widget=forms.Select(choices=[('', '--- Select One ---')]))
 
     class Meta:
         model = Topic
-        fields = ['country', 'select_state', 'select_board', 'select_grade', 'stream', 'subject', 'chapter', 'title', 'description']
+        fields = ['country', 'select_state', 'select_board', 'select_grade', 'select_stream', 'select_subject', 'chapter', 'title', 'description']
 

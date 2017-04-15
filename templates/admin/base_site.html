@@ -18,8 +18,24 @@
         console.log(data);
         data['field_name'] = field_name;
         $.post( "/filter/fields/", data, function( data ) {
-            $("#id_"+child_names).html(data[0]['option_data']);
-            $("#id_hidden_"+child_names).val(data[0]['hidden_field_value']);
+            console.log(data);
+            if(data[0]){
+                if(data[0].hasOwnProperty('html_add_on_id')){
+                    child_names = data[0]['html_add_on_id'];
+                }
+
+                if(data[0].hasOwnProperty('null_option_message')){
+                    var id = 'id_help_'+child_names;
+                    $("#"+id).html('');
+                    $("#id_"+child_names).after("<p id='"+id+"' style='color:red;'>"+data[0]['null_option_message']+"</p>");
+                }
+                else{
+                    $( "#id_help_"+child_names ).html('');
+                }
+
+                $("#id_"+child_names).html(data[0]['option_data']);
+                $("#id_hidden_"+child_names).val(data[0]['hidden_field_value']);
+             }
         });
     }
 
@@ -29,9 +45,17 @@
         data['model_name'] = '{{ opts.model_name }}';
         data['country'] = $('#id_country').val();
         data['board'] = $('#id_select_board').val();
-        data['grade'] = $('#id_grade').val();
+
+        // collect grade data
+        data['grade'] = []
+        $('input[name="select_grade"]:checked').each(function(){
+            data['grade'].push($(this).val());
+        });
+
+        data['select_grade'] = $('#id_select_grade').val();
+
         data['state'] = $('#id_select_state').val();
-        data['stream'] = $('#id_stream').val();
+        data['stream'] = $('#id_select_stream').val();
         data['subject'] = $('#id_subject').val();
 
         return data;
@@ -50,10 +74,10 @@
     });
 
     $('#id_select_grade').change(function(){
-        filter_field(collect_data(), 'stream', 'stream');
+        filter_field(collect_data(), 'grade', 'select_stream');
     });
 
-    $('#id_stream').change(function(){
+    $('#id_select_stream').change(function(){
         filter_field(collect_data(), 'stream', 'subject');
     });
 

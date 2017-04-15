@@ -3,7 +3,7 @@ from django import forms
 # from django.shortcuts import get_object_or_404
 from country_state.models import (Country)
 from .models import (ClassCategory, BoardCategory)
-from course_management.models import Course
+from course_management.models import (Course, Subject)
 # from utils import (refile_form_from_hidden_fields, set_drop_downs_in_form)
 
 from constants.global_constant import MULTI_SELECT_GRADE_HELP
@@ -34,12 +34,45 @@ class BasicFilterField(forms.ModelForm):
     def _check_stream_grade_uniqueness(self, select_grade_list):
         error_on_grade = []
         select_grade_list = self.select_grade_clean(select_grade_list)
-        if select_grade_list:
-            for grade_pk in select_grade_list:
-                if Course.objects.filter(title=self.data.get('title'), grade__code=grade_pk).exists():
-                    error_on_grade.append(ClassCategory.objects.get(pk=grade_pk).title)
+        for grade_pk in select_grade_list:
+            try:
+                title = self.data.get('title')
+                Course.objects.get(title=title.lower(), grade__code=grade_pk)
+            except Course.DoesNotExist as e:
+                pass
+            else:
+                error_on_grade.append(ClassCategory.objects.get(pk=grade_pk).title)
 
         return error_on_grade
+
+    def _check_grade_course_subject_title_uniqueness(self):
+        selected_grades = self.data.getlist('select_grade')
+        selected_grades = self.select_grade_clean(selected_grades)
+        stream_title = self.data.get('select_stream')
+        subject_title = self.data.get('title')
+        error_on_grade = []
+        for grade_pk in selected_grades:
+            try:
+                Subject.objects.get(title=subject_title.lower(), course__title=stream_title.lower(),
+                                    course__grade__pk=grade_pk)
+            except Subject.DoesNotExist as e:
+                print(e.args)
+            else:
+                grade_title = ClassCategory.objects.values_list('title', flat=True).get(pk=grade_pk)
+                error_on_grade.append(grade_title)
+        if error_on_grade:
+            raise forms.ValidationError('This title already exist with stream(s)- "{0}" '
+                                        'and grade(s)- "{1}"'.format(stream_title, ','.join(error_on_grade)))
+
+    def _check_grade_course_subject_chapter_title_uniqueness(self):
+        selected_grades = self.data.getlist('select_grade')
+        selected_grades = self.select_grade_clean(selected_grades)
+        stream_title = self.data.get('select_stream')
+        topic_title = self.data.get('title')
+        for grades_pk in selected_grades:
+            pass
+
+
 
     def get_options_from_hidden_filed(self, value_str):
         """
@@ -48,7 +81,7 @@ class BasicFilterField(forms.ModelForm):
         """
         _options = []
         data_list = value_str.strip('||').split('||') if value_str else []
-
+        data_list = self.select_grade_clean(data_list)
         for data in data_list:
             value = data.split(':')
             _options.append((value[0], value[1]))
@@ -68,6 +101,12 @@ class BasicFilterField(forms.ModelForm):
             self.fields['select_board'].widget = \
                 forms.Select(choices=[('', '--- Select One ---')] + SELECT_BOARD_OPTIONS)
 
+        if 'select_stream' in _field_list:
+            SELECT_STREAM_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_stream'))
+            print(SELECT_STREAM_OPTIONS)
+            self.fields['select_stream'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + SELECT_STREAM_OPTIONS)
+
         if 'select_grade' in _field_list:
             SELECT_GRADE_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_grade'))
             if 'grade' in kwargs.keys():
@@ -77,9 +116,19 @@ class BasicFilterField(forms.ModelForm):
                 elif kwargs['grade']['type'] == 'radio_select':
                     self.fields['select_grade'].widget = \
                         forms.RadioSelect(choices=SELECT_GRADE_OPTIONS)
+
+                elif kwargs['grade']['type'] == 'drop_down_select':
+                    self.fields['select_grade'].widget = \
+                        forms.Select(choices=[('', '--- Select One ---')] + SELECT_GRADE_OPTIONS)
             else:
                 self.fields['select_grade'].widget = \
                     forms.Select(choices=[('', '--- Select One ---')] + SELECT_GRADE_OPTIONS)
+
+        if 'select_subject' in _field_list:
+            SELECT_SUBJECT_OPTIONS = self.get_options_from_hidden_filed(self.data.get('hidden_select_subject'))
+            print(SELECT_SUBJECT_OPTIONS)
+            self.fields['select_subject'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + SELECT_SUBJECT_OPTIONS)
 
     def set_drop_downs_in_form_via_data_set(self, **kwargs):
         _field_list = self.fields.keys()
@@ -92,6 +141,14 @@ class BasicFilterField(forms.ModelForm):
             self.fields['select_board'].widget = \
                 forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_BOARD_OPTIONS'])
 
+        if 'select_stream' in _field_list:
+            self.fields['select_stream'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_STREAM_OPTIONS'])
+
+        if 'select_subject' in _field_list:
+            self.fields['select_subject'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_SUBJECT_OPTIONS'])
+
         if 'select_grade' in _field_list:
             if 'grade' in kwargs.keys():
                 if kwargs['grade']['type'] == 'multi_select':
@@ -101,6 +158,10 @@ class BasicFilterField(forms.ModelForm):
                 elif kwargs['grade']['type'] == 'radio_select':
                     self.fields['select_grade'].widget = \
                         forms.RadioSelect(choices=kwargs['SELECT_GRADE_OPTIONS'])
+
+                elif kwargs['grade']['type'] == 'drop_down_select':
+                    self.fields['select_grade'].widget = \
+                        forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_GRADE_OPTIONS'])
             else:
                 self.fields['select_grade'].widget = \
                     forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_GRADE_OPTIONS'])

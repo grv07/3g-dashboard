@@ -21,7 +21,8 @@ FILTER_ON_DYNAMIC_MODELS = OrderedDict({'boardcategory': BoardCategory, 'classca
                               'topic': Topic, 'moduledata': ModuleData
                               })
 
-PARENT_KEY_CHILD_VALUE = {'country': State, 'state': BoardCategory, 'board': ClassCategory, 'stream': Subject, 'subject': Chapter}
+PARENT_KEY_CHILD_VALUE = {'country': State, 'state': BoardCategory, 'board': ClassCategory,
+                          'grade': Course, 'stream': Subject, 'subject': Chapter}
 
 GLOBAL_LIST_DISPLAY = ('get_title', 'is_live')
 
