@@ -39,18 +39,23 @@ def logout_user(request):
     """
     To logout the user and redirect to the login page.
     :param request:
-    :return:
+    :return: redirects the user to the login page.
     """
     logout(request)
     return redirect('task_management:login')
 
 
 def get_uploaders(request):
-    admin_id = request.user.id
+    """
+    To get the list of uploaders created by the admin which is logged in.
+    :param request:
+    :return: the list of uploaders.
+    """
+    admin_id = request.user.id  # to get the id of the admin
     uploader_list = []
-    for uploader in MyUser.objects.filter(owner=admin_id):
+    for uploader in MyUser.objects.filter(owner=admin_id):  # gets the list of uploaders whose owner is the logged in user.
         uploader_permissions = []
-        uploader_module_permissions = Permission.objects.filter(content_type_id__model='moduledata', user=uploader.id)
+        uploader_module_permissions = Permission.objects.filter(content_type_id__model='moduledata', user=uploader.id)  # gets the permissions of allotted to the uploader
         for module_permission in uploader_module_permissions:
             uploader_permissions.append(ModuleData.objects.get(code=module_permission.name))
         uploader_list.append({'uploader': uploader, 'permissions': uploader_permissions})
@@ -61,12 +66,12 @@ def dashboard(request):
     """
     Dashboard for the admin.
     :param request:
-    :return:
+    :return: the list of tasks allotted to/by the uploader/admin.
     """
-    if request.user.is_staff and request.user.is_authenticated:
+    if request.user.is_staff and request.user.is_authenticated:  # for admin login
         tasks = Task.objects.filter(assigned_by_id=request.user.id)
         return render(request, 'admin_dashboard.html', {'tasks': tasks})
-    elif request.user.is_authenticated:
+    elif request.user.is_authenticated:  # for uploader login
         tasks = Task.objects.filter(assign_to_id__user_id=request.user.id)
         return render(request, 'dashboard.html', {'tasks': tasks})
     else:
@@ -78,7 +83,7 @@ def assign_task(request, uploader_id):
     To assign task to the uploader by the admin.
     :param request:
     :param uploader_id:
-    :return:
+    :return: process to assign task to the uploader
     """
     form = TaskAssignForm(request.POST or None)
     if form.is_valid():
@@ -105,7 +110,7 @@ def permissions(request, uploader_id):
     Get the permissions allotted to the user.
     :param request:
     :param uploader_id:
-    :return:
+    :return: list of all the permissions allotted to the specific uploader
     """
     subject_content = []
     chapter_content = []
@@ -170,7 +175,7 @@ def edit_task(request, task_id):
     To edit the task.
     :param request:
     :param task_id:
-    :return:
+    :return: redirects to the dashboard on successful editing of the task
     """
     task = get_object_or_404(Task, pk=task_id)
     form = TaskAssignForm(request.POST or None, instance=task)
@@ -194,7 +199,7 @@ def delete_task(request, task_id):
     To delete a task, can only be done by the admin or super-admin.
     :param request:
     :param task_id:
-    :return:
+    :return: redirects to dashboard on successful deletion of the task or shows error message.
     """
     if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
         task = get_object_or_404(Task, pk=task_id)
@@ -209,7 +214,7 @@ def task_complete(request, task_id):
     To change the status of the task to completed, by the uploader.
     :param request:
     :param task_id:
-    :return:
+    :return: changes the status of the task.
     """
     if request.user.is_active and request.user.is_authenticated:
         task = get_object_or_404(Task, pk=task_id)
@@ -227,7 +232,7 @@ def upload_task_data(request, task_id):
     Open view for uploading data
     :param request:
     :param task_id:
-    :return:
+    :return: renders the task data upload page
     """
     if request.user.is_active and request.user.is_authenticated:
         task = get_object_or_404(Task, pk=task_id)
