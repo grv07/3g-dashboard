@@ -1,12 +1,12 @@
-from .models import Uploader
-from django.db.models import Q
-
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import (UserAdmin, GroupAdmin)
 from django.contrib import admin
-from django.contrib.auth.models import Permission
 from django.forms import widgets
-from admin_custom.user_field import MyUserCreationForm, MyUserChangeForm
-from .models import MyUser
+from django.contrib.auth.models import (Permission, Group)
+
+from admin_custom.user_field import (MyUserCreationForm, MyUserChangeForm)
+from .models import (MyUser, Uploader)
+
+from utils import get_users_permissions_list
 
 # from django.contrib.admin.models import LogEntry
 
@@ -16,21 +16,58 @@ from .models import MyUser
 
 # class LogEntryAdmin(admin.ModelAdmin):
 #     list_display = ('object_repr', 'change_message', 'user',)
+admin.site.unregister(Group)
+
+
+class CustomGroupAdmin(GroupAdmin):
+    """
+    Customize group class entries
+    """
+    def get_queryset(self, request):
+        """How admin list is filter"""
+        return Group.objects.filter(id__lt=20)
+
+    def save_model(self, request, obj, form, change):
+        """
+        Add owner value on every user object.
+        :param request:
+        :param obj:
+        :param form:
+        :param change:
+        :return:
+        """
+        obj.owner = request.user
+        print(obj.owner)
+        super(CustomGroupAdmin, self).save_model(request, obj, form, change)
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Hide owner field in group
+        :param request:
+        :param obj:
+        :param kwargs:
+        :return:
+        """
+        form = super(CustomGroupAdmin, self).get_form(request, obj, **kwargs)
+        self.exclude = ('owner',)
+        if 'owner' in form.base_fields:
+            form.base_fields['owner'].widget = widgets.HiddenInput()
+        # print(form.base_fields)
+        if 'permissions' in form.base_fields:
+            permissions = form.base_fields['permissions']
+            permissions.queryset = get_users_permissions_list(request, permissions)
+        return form
 
 
 class MyUserAdmin(UserAdmin):
     """
     This relation is important to read before any change:
-
     save_model: call on save a user object.
-
     get_queryset: Use to filter owners user.
-
     """
     def save_model(self, request, obj, form, change):
         """
         Add owner value on every user object.
-
         :param request:
         :param obj:
         :param form:
@@ -46,7 +83,6 @@ class MyUserAdmin(UserAdmin):
             return all Users
         else:
             return only created users by request.user.
-
         :param request:
         :return: queryset
         """
@@ -67,12 +103,12 @@ class MyUserAdmin(UserAdmin):
     def get_form(self, request, obj=None, **kwargs):
         """
         Filter permission list.
-
         if user is super-admin:
-            can see or select from all permissions avail.
+            can see or select all permissions avail.
+            can see or select all group avail.
         elif user is admin:
             can select or allow his own permissions to any other user only.
-
+            can select or allow his own group to any other user only.
         :param request:
         :param obj:
         :param kwargs:
@@ -81,36 +117,29 @@ class MyUserAdmin(UserAdmin):
         # Get form from original UserAdmin.
         form = super(MyUserAdmin, self).get_form(request, obj, **kwargs)
         if 'user_permissions' in form.base_fields:
-            print('@@@@@@@@@@@@@@@@@@@@@@@@')
             permissions = form.base_fields['user_permissions']
-            if request.user.is_superuser:
-                permissions.queryset = permissions.queryset.all()
-            elif request.user.is_staff:
-                print('************ is admin ******************')
-                form.base_fields['is_active'].widget = widgets.HiddenInput()
-                form.base_fields['is_staff'].widget = widgets.HiddenInput()
-                form.base_fields['is_superuser'].widget = widgets.HiddenInput()
+            if not request.user.is_superuser:
+                if request.user.is_staff:
+                    form.base_fields['is_active'].widget = widgets.HiddenInput()
+                    form.base_fields['is_staff'].widget = widgets.HiddenInput()
+                    form.base_fields['is_superuser'].widget = widgets.HiddenInput()
+                else:
+                    form.base_fields['is_active'].widget = widgets.HiddenInput()
+                    form.base_fields['is_staff'].widget = widgets.HiddenInput()
+                    form.base_fields['is_superuser'].widget = widgets.HiddenInput()
 
-                permissions_id = []
-                for group in request.user.groups.all():
-                    for permission in group.permissions.all():
-                        permissions_id.append(permission.id)
-                permissions_id += [perm.id for perm in Permission.objects.filter(user=request.user)]
-                permissions.queryset = permissions.queryset.filter(
-                    pk__in=permissions_id, content_type__model='moduledata'
-                ).exclude(name__icontains='Can')
-            else:
-                print('###############')
-                form.base_fields['is_active'].widget = widgets.HiddenInput()
-                form.base_fields['is_staff'].widget = widgets.HiddenInput()
-                form.base_fields['is_superuser'].widget = widgets.HiddenInput()
-                permissions.queryset = permissions.queryset.filter(user=request.user)
+            permissions.queryset = get_users_permissions_list(request, permissions)
+
+        if 'groups' in form.base_fields:
+            groups = form.base_fields['groups']
+            if not request.user.is_superuser:
+                groups.queryset = groups.queryset.filter(owner=request.user)
         return form
     form = MyUserChangeForm
     add_form = MyUserCreationForm
 
 admin.site.register(MyUser, MyUserAdmin)
-# admin.site.register(LogEntry, LogEntryAdmin)
+admin.site.register(Group, CustomGroupAdmin)
 # Register your models here.
 
 
@@ -121,7 +150,6 @@ class UploaderAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """
         Filter for show users that are own by request.user.
-
         :param request:
         :return:
         """
@@ -133,9 +161,7 @@ class UploaderAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         """
         Filter user list
-
         return all avail_users for uploader creation.
-
         :param request:
         :param obj:
         :param kwargs:

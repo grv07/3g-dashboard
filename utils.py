@@ -3,8 +3,74 @@ from email.mime.text import MIMEText
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 from django.utils.text import slugify
+from django import forms
 
 import inspect
+
+
+def set_drop_downs_in_form(_form_obj,  **kwargs):
+    # print(kwargs)
+    _field_list = _form_obj.fields.keys()
+
+    if 'select_state' in _field_list:
+        _form_obj.fields['select_state'].widget = \
+            forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_STATE_OPTIONS'])
+
+    if 'select_board' in _field_list:
+        _form_obj.fields['select_board'].widget = \
+            forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_BOARD_OPTIONS'])
+
+    if 'select_grade' in _field_list:
+        if 'grade' in kwargs.keys():
+            if kwargs['grade']['type'] == 'multi_select':
+                _form_obj.fields['select_grade'].widget = \
+                    forms.CheckboxSelectMultiple(choices=kwargs['SELECT_GRADE_OPTIONS'])
+            elif kwargs['grade']['type'] == 'radio_select':
+                _form_obj.fields['select_grade'].widget = \
+                    forms.RadioSelect(choices=kwargs['SELECT_GRADE_OPTIONS'])
+        else:
+            _form_obj.fields['select_grade'].widget = \
+                forms.Select(choices=[('', '--- Select One ---')] + kwargs['SELECT_GRADE_OPTIONS'])
+
+
+def get_options_from_hidden_filed(value_str):
+    """
+    return options = [('key', 'val'), ... .. ]
+    Get options to add on form fields when error happen.
+    """
+    _options = []
+    data_list = value_str.strip('||').split('||') if value_str else []
+
+    for data in data_list:
+        value = data.split(':')
+        _options.append((value[0], value[1]))
+    return _options
+
+
+def refile_form_from_hidden_fields(_form_obj, grade_type=None):
+    SELECT_STATE_OPTIONS = get_options_from_hidden_filed(_form_obj.data['hidden_select_state'])
+    SELECT_BOARD_OPTIONS = get_options_from_hidden_filed(_form_obj.data['hidden_select_board'])
+    SELECT_GRADE_OPTIONS = get_options_from_hidden_filed(_form_obj.data['hidden_select_grade'])
+
+    base_data = {'SELECT_STATE_OPTIONS': SELECT_STATE_OPTIONS, 'SELECT_BOARD_OPTIONS': SELECT_BOARD_OPTIONS,
+                                       'SELECT_GRADE_OPTIONS': SELECT_GRADE_OPTIONS}
+    if grade_type:
+        base_data['grade'] = grade_type
+    set_drop_downs_in_form(_form_obj, **base_data)
+
+
+def hide_all_related_child(instance):
+    from constants.global_constant import (PERMISSION_CODENAME_FORMAT, PERMISSION_NAME_FORMAT)
+    _class_name = instance.__class__.__name__
+    _parent_key = instance.code
+    _modal_name = PERMISSION_CODENAME_FORMAT.get(_class_name.lower())
+    _loop_on_child_modal = PERMISSION_NAME_FORMAT[PERMISSION_NAME_FORMAT.index(_modal_name)+1:]
+    print(_loop_on_child_modal)
+
+
+def get_log_msg(instance, **kwargs):
+    instance.change_message = str(instance)
+    return instance
 
 
 def uuid_name_definition(parent, str_uuid):
@@ -38,6 +104,26 @@ def get_permission_name(instance):
 #                       "logs: https://mailgun.com/cp/log .  You can send up to 300 emails/day from this "
 #                       "sandbox server.  Next, you should add your own domain so you can send 10,000 "
 #                       "emails/month for free."})
+
+
+def get_users_permissions_list(request, permissions):
+    if request.user.is_superuser:
+        permissions_queryset = permissions.queryset.all()
+    elif request.user.is_staff:
+        permissions_id = []
+        for group in request.user.groups.all():
+            for permission in group.permissions.all():
+                permissions_id.append(permission.id)
+        # print(permissions_id)
+        for perm in Permission.objects.filter(user=request.user):
+            permissions_id.append(perm.id)
+
+        permissions_queryset = permissions.queryset.filter(
+            pk__in=permissions_id, content_type__model='moduledata'
+        ).exclude(name__icontains='Can')
+    else:
+        permissions_queryset = permissions.queryset.filter(user=request.user)
+    return permissions_queryset
 
 
 def send_mail(to, subject, msg_body, password=None):

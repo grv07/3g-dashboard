@@ -19,7 +19,6 @@ def login_user(request):
     :return: The list of tasks allotted to the user.
     """
     if request.method == 'POST':
-
         form = UserLoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -29,7 +28,6 @@ def login_user(request):
             if user.is_active:
                 login(request, user)
                 return redirect('task_management:dashboard')
-
             else:
                 return render(request, 'login.html', {'error_message': 'Account disabled'})
 
@@ -56,7 +54,6 @@ def get_uploaders(request):
         for module_permission in uploader_module_permissions:
             uploader_permissions.append(ModuleData.objects.get(code=module_permission.name))
         uploader_list.append({'uploader': uploader, 'permissions': uploader_permissions})
-    print(uploader_list)
     return render(request, 'select_uploader.html', {'uploader_list': uploader_list})
 
 
@@ -66,12 +63,14 @@ def dashboard(request):
     :param request:
     :return:
     """
-    if request.user.is_staff:
+    if request.user.is_staff and request.user.is_authenticated:
         tasks = Task.objects.filter(assigned_by_id=request.user.id)
         return render(request, 'admin_dashboard.html', {'tasks': tasks})
-    else:
+    elif request.user.is_authenticated:
         tasks = Task.objects.filter(assign_to_id__user_id=request.user.id)
         return render(request, 'dashboard.html', {'tasks': tasks})
+    else:
+        return redirect('task_management:login')
 
 
 def assign_task(request, uploader_id):
@@ -197,7 +196,7 @@ def delete_task(request, task_id):
     :param task_id:
     :return:
     """
-    if request.user.is_staff or request.user.is_superuser:
+    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
         task = get_object_or_404(Task, pk=task_id)
         task.delete()
         return redirect('task_management:dashboard')
@@ -212,8 +211,7 @@ def task_complete(request, task_id):
     :param task_id:
     :return:
     """
-    if request.user.is_active:
-
+    if request.user.is_active and request.user.is_authenticated:
         task = get_object_or_404(Task, pk=task_id)
         print(task.status)
         task.status = 'UNDER REVIEW'
@@ -231,6 +229,8 @@ def upload_task_data(request, task_id):
     :param task_id:
     :return:
     """
-    if request.user.is_active:
+    if request.user.is_active and request.user.is_authenticated:
         task = get_object_or_404(Task, pk=task_id)
         return render(request, 'detail.html', {'task': task})
+    else:
+        raise Http404
