@@ -14,11 +14,28 @@
 {% block footer %}
 <div id="footer">
 <script>
-    function filter_field(data, field_name, child_name){
+    function filter_field(data, field_name, child_names){
         console.log(data);
         data['field_name'] = field_name;
         $.post( "/filter/fields/", data, function( data ) {
-          $( "#"+child_name ).html( data );
+            console.log(data);
+            if(data[0]){
+                if(data[0].hasOwnProperty('html_add_on_id')){
+                    child_names = data[0]['html_add_on_id'];
+                }
+
+                if(data[0].hasOwnProperty('null_option_message')){
+                    var id = 'id_help_'+child_names;
+                    $("#"+id).html('');
+                    $("#id_"+child_names).after("<p id='"+id+"' class='help' style='color:red;'>"+data[0]['null_option_message']+"</p>");
+                }
+                else{
+                    $( "#id_help_"+child_names ).html('');
+                }
+                console.log(child_names);
+                $("#id_"+child_names).html(data[0]['option_data']);
+                $("#id_hidden_"+child_names).val(data[0]['hidden_field_value']);
+             }
         });
     }
 
@@ -27,34 +44,55 @@
         data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
         data['model_name'] = '{{ opts.model_name }}';
         data['country'] = $('#id_country').val();
-        data['state'] = $('#id_state').val();
-        data['stream'] = $('#id_stream').val();
-        data['subject'] = $('#id_subject').val();
+        data['board'] = $('#id_select_board').val();
+
+        // collect grade data
+        data['grade'] = []
+        $('input[name="select_grade"]:checked').each(function(){
+            data['grade'].push($(this).val());
+        });
+
+        data['select_grade'] = $('#id_select_grade').val();
+
+        data['state'] = $('#id_select_state').val();
+        data['stream'] = $('#id_select_stream').val();
+        data['subject'] = $('#id_select_subject').val();
 
         return data;
     }
 
     $('#id_country').change(function(){
-        filter_field(collect_data(), 'country', 'id_state');
+        filter_field(collect_data(), 'country', 'select_state');
     });
 
-    $('#id_state').change(function(){
-        filter_field(collect_data(), 'state', 'id_stream');
+    $('#id_select_state').change(function(){
+        filter_field(collect_data(), 'state', 'select_board');
     });
 
-    $('#id_stream').change(function(){
-        filter_field(collect_data(), 'stream', 'id_subject');
+    $('#id_select_board').change(function(){
+        filter_field(collect_data(), 'board', 'select_grade');
     });
 
-    $('#id_subject').change(function(){
-        filter_field(collect_data(), 'subject', 'id_chapter');
+    $('#id_select_grade').change(function(){
+        filter_field(collect_data(), 'grade', 'select_stream');
+    });
+
+    $('#id_select_stream').change(function(){
+        filter_field(collect_data(), 'stream', 'subject');
+    });
+
+    $('#id_select_subject').change(function(){
+        filter_field(collect_data(), 'subject', 'select_chapter');
     });
 
     //$('#id_chapter').change(function(){
     //    console.log('Country Change ...');
     //});
 
-
+    if("{{ opts.model_name }}" == "classcategory"){
+        $('#top_form_msg').html("<li style='color:blue;'>Select grade or enter in title for new or both.</li>");
+        // Add a msg on top of form.
+    }
 
 </script>
 </div>

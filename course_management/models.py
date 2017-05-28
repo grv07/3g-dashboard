@@ -20,7 +20,7 @@ class CommonInfo(models.Model):
     """
     Abstract class for reduce size of lines .. ;)
     """
-    title = models.TextField(max_length=100)
+    title = models.TextField(blank=False, max_length=100)
     slug = models.SlugField(editable=False, max_length=150)
     description = models.TextField(max_length=1500)
     is_live = models.BooleanField(default=True)
@@ -46,29 +46,40 @@ class CommonInfo(models.Model):
         ordering = ('title',)
 
 
+class CourseManager(models.Manager):
+    def get_distinct_stream_via_board(self, board_pk):
+        return self.values_list('title', 'title').filter(grade__board__pk=board_pk).order_by('title', '-created').distinct('title')
+
+
 class Course(CommonInfo):
     """
     Course class for CRUD
     """
-    class_category = models.ForeignKey('classes.ClassCategory', default=default_uuid)
+    grade = models.ForeignKey('classes.ClassCategory', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    objects = CourseManager()
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "1. Stream"
         verbose_name = "Stream"
-        unique_together = ['title', 'class_category']
-        ordering = ('class_category__title', 'title',)
+        unique_together = ['title', 'grade']
+        ordering = ('grade__title', 'title',)
 
     def __str__(self):
         """Return slug and first 8 char"""
-        return name_definition(self.title, self.class_category)
+        return name_definition(self.title, self.grade)
 
     def get_uuid_name_definition(self):
-        return uuid_name_definition(self.class_category, str(self.code))
+        return uuid_name_definition(self.grade, str(self.code))
 
     def chained_relation(self):
         print('Hello gaurav ...')
         return self.item_set.filter(is_present=True)
+
+
+class SubjectManager(models.Manager):
+    def get_distinct_stream_via_grade(self, stream_title, grade_pk):
+        return self.values_list('code', 'title').filter(course__title=stream_title, course__grade__pk=grade_pk)
 
 
 class Subject(CommonInfo):
@@ -77,11 +88,12 @@ class Subject(CommonInfo):
     """
     course = models.ForeignKey('Course', default=default_uuid)
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    objects = SubjectManager()
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "2. Subject"
         unique_together = ['title', 'course']
-        ordering = ('-course__class_category__title', 'title',)
+        ordering = ('-course__grade__title', 'title',)
 
     def __str__(self):
         """
@@ -98,12 +110,13 @@ class Chapter(CommonInfo):
     Chapter class for CRUD
     """
     subject = models.ForeignKey('Subject', default=default_uuid)
+    chapter_number = models.PositiveIntegerField()
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "3. Chapter"
         unique_together = ['title', 'subject']
-        ordering = ('-subject__course__class_category__title', 'title',)
+        ordering = ('-subject__course__grade__title', 'title',)
 
     def __str__(self):
         """Return slug and first 8 char"""
@@ -124,7 +137,7 @@ class Topic(CommonInfo):
         verbose_name = "Concept"
         verbose_name_plural = "4. Concept"
         unique_together = ['title', 'chapter']
-        ordering = ('-chapter__subject__course__class_category__title', 'title',)
+        ordering = ('-chapter__subject__course__grade__title', 'title',)
 
     def __str__(self):
         """
@@ -146,7 +159,7 @@ class ModuleData(CommonInfo):
     class Meta(CommonInfo.Meta):
         verbose_name_plural = "5. Module(s) Data"
         unique_together = ['title', 'topic']
-        ordering = ('-topic__chapter__subject__course__class_category__title', 'title',)
+        ordering = ('-topic__chapter__subject__course__grade__title', 'title',)
 
     def __str__(self):
         """

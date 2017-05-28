@@ -58,7 +58,7 @@ def build(ctx, new=False):
 
     # ctx.run("mkdir "+base_dir)
     ctx.run("cd " + base_dir)
-    # ctx.run("touch "+base_dir+"/test")
+    # ctx.run("touch "+base_dir+"/form_filter")
     # ctx.run(server_login_string.format(**local_env_settings))
 
     # the filename, or list of file-names, of optional private key(s)
